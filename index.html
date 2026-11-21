@@ -3,32 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>api77 · 私人反代面板</title>
+  <title>77api</title>
   <style>
-    /* ========= iOS 奶白薄荷主题变量（在 GitHub 改这里即可换肤） ========= */
+    /* ========= 77api 纯白黑灰极简主题变量 ========= */
     :root {
-      --bg-base: #f4f8f6;
-      --surface: rgba(255, 255, 255, 0.78);
-      --surface-solid: #ffffff;
-      --surface-subtle: rgba(241, 247, 244, 0.85);
-      --border: rgba(15, 23, 42, 0.065);
-      --border-glass: rgba(255, 255, 255, 0.88);
-      --text: #111827;
-      --text-secondary: #475569;
-      --muted: #7c8b99;
-      --mint: #10b981;
-      --mint-deep: #059669;
-      --mint-soft: rgba(16, 185, 129, 0.12);
-      --mint-glow: rgba(16, 185, 129, 0.22);
-      --danger: #e11d48;
-      --danger-soft: rgba(225, 29, 72, 0.10);
-      --amber: #d97706;
-      --amber-soft: rgba(217, 119, 6, 0.11);
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
-      --shadow-card: 0 8px 28px rgba(15, 38, 30, 0.045), 0 1px 2px rgba(15, 38, 30, 0.03);
-      --shadow-float: 0 12px 32px rgba(15, 38, 30, 0.10);
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-soft: #f2f3f5;
+      --surface-hover: #ebedf0;
+      --border: rgba(17, 24, 39, 0.08);
+      --border-strong: rgba(17, 24, 39, 0.14);
+      --ink: #111315;
+      --ink-secondary: #4b5563;
+      --muted: #8a939e;
+      --ok: #16a34a;
+      --ok-soft: #ecfdf5;
+      --pro: #b45309;
+      --pro-soft: #fffbeb;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 6px 20px rgba(16, 24, 40, 0.035);
+      --shadow-float: 0 10px 30px rgba(16, 24, 40, 0.10), 0 1px 3px rgba(16, 24, 40, 0.06);
+      --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     * {
@@ -39,14 +38,9 @@
     html, body {
       margin: 0;
       min-height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
-      color: var(--text);
-      background-color: var(--bg-base);
-      background-image:
-        radial-gradient(circle at 12% 8%, rgba(167, 243, 208, 0.42) 0%, transparent 42%),
-        radial-gradient(circle at 88% 18%, rgba(209, 250, 229, 0.55) 0%, transparent 46%),
-        radial-gradient(circle at 50% 95%, rgba(226, 242, 237, 0.65) 0%, transparent 50%);
-      background-attachment: fixed;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+      color: var(--ink);
+      background: var(--bg);
       -webkit-font-smoothing: antialiased;
     }
 
@@ -65,18 +59,18 @@
       flex-shrink: 0;
     }
     .icon-sm { width: 15px; height: 15px; }
-    .icon-lg { width: 21px; height: 21px; }
+    .icon-lg { width: 20px; height: 20px; }
 
-    /* Top Bar */
+    /* Header */
     header {
       position: sticky;
       top: 0;
       z-index: 20;
-      padding: calc(12px + env(safe-area-inset-top, 0px)) 18px 12px;
-      background: rgba(244, 248, 246, 0.72);
-      backdrop-filter: blur(22px) saturate(160%);
-      -webkit-backdrop-filter: blur(22px) saturate(160%);
-      border-bottom: 1px solid rgba(15, 23, 42, 0.045);
+      padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
+      background: rgba(246, 247, 249, 0.84);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -90,13 +84,15 @@
     .brand-mark {
       width: 34px;
       height: 34px;
-      border-radius: 11px;
-      background: linear-gradient(145deg, #34d399, #059669);
+      border-radius: 10px;
+      background: var(--ink);
       color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 14px var(--mint-glow);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: -0.04em;
     }
     .brand-title {
       font-size: 16px;
@@ -112,39 +108,40 @@
       gap: 5px;
       margin-top: 2px;
     }
-    .pulse-dot {
-      width: 7px;
-      height: 7px;
+    .status-dot {
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: var(--mint);
-      box-shadow: 0 0 0 3px var(--mint-soft);
+      background: var(--ok);
     }
 
     main {
       max-width: 720px;
       margin: 0 auto;
-      padding: 16px 15px 12px;
+      padding: 16px 14px 12px;
     }
 
-    .page { display: none; animation: fadeIn 0.18s ease; }
-    .page.active { display: block; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
+    .page {
+      display: none;
+    }
+    .page.active {
+      display: block;
+      animation: pageEnter 0.24s var(--ease-spring);
+    }
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Glass Cards */
+    /* Cards */
     .card {
       background: var(--surface);
-      backdrop-filter: blur(20px) saturate(150%);
-      -webkit-backdrop-filter: blur(20px) saturate(150%);
-      border: 1px solid var(--border-glass);
+      border: 1px solid var(--border);
       box-shadow: var(--shadow-card);
       border-radius: var(--radius-lg);
-      padding: 16px 18px;
-      margin-bottom: 13px;
+      padding: 16px;
+      margin-bottom: 12px;
     }
-
     .card-header {
       display: flex;
       align-items: center;
@@ -153,59 +150,47 @@
       margin-bottom: 12px;
     }
     .card-title {
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 650;
       letter-spacing: -0.01em;
       display: flex;
       align-items: center;
       gap: 7px;
-      color: var(--text);
+      color: var(--ink);
     }
 
-    /* Stats Grid */
+    /* Stats */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 11px;
-      margin-bottom: 13px;
+      gap: 10px;
+      margin-bottom: 12px;
     }
     .stat-card {
       background: var(--surface);
-      backdrop-filter: blur(20px) saturate(150%);
-      -webkit-backdrop-filter: blur(20px) saturate(150%);
-      border: 1px solid var(--border-glass);
+      border: 1px solid var(--border);
       box-shadow: var(--shadow-card);
       border-radius: var(--radius-lg);
-      padding: 14px 16px;
+      padding: 14px 15px;
     }
     .stat-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
       color: var(--muted);
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 500;
     }
-    .stat-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 9px;
-      background: var(--mint-soft);
-      color: var(--mint-deep);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
     .stat-val {
-      font-size: 24px;
+      font-size: 23px;
       font-weight: 700;
       letter-spacing: -0.03em;
       font-variant-numeric: tabular-nums;
       margin-top: 8px;
-      color: var(--text);
+      color: var(--ink);
     }
 
-    /* Layout Helpers */
+    /* Helpers */
     .row {
       display: flex;
       align-items: center;
@@ -216,23 +201,25 @@
     .row-tight {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
       flex-wrap: wrap;
     }
     .muted { color: var(--muted); font-size: 12.5px; }
     .mono {
       font-family: ui-monospace, "SF Mono", Menlo, monospace;
       font-size: 12.5px;
-      color: var(--text-secondary);
+      color: var(--ink-secondary);
       word-break: break-all;
+      user-select: all;
+      -webkit-user-select: all;
     }
 
-    /* Info Pill Box */
+    /* Endpoint Box */
     .endpoint-box {
-      background: var(--surface-subtle);
+      background: var(--surface-soft);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 11px 13px;
+      padding: 11px 12px;
       margin-bottom: 10px;
     }
     .endpoint-box:last-child { margin-bottom: 0; }
@@ -248,87 +235,134 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 3px 9px;
+      padding: 2.5px 8px;
       border-radius: 999px;
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 600;
       letter-spacing: -0.01em;
     }
-    .badge-ok { background: var(--mint-soft); color: var(--mint-deep); }
+    .badge-ok { background: var(--ok-soft); color: var(--ok); }
+    .badge-pro { background: var(--pro-soft); color: var(--pro); }
     .badge-err { background: var(--danger-soft); color: var(--danger); }
-    .badge-neutral { background: rgba(100, 116, 139, 0.11); color: var(--text-secondary); }
+    .badge-neutral { background: var(--surface-soft); color: var(--ink-secondary); }
 
-    /* Buttons */
+    /* Buttons with tactile spring feedback */
     button {
       border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--text);
-      padding: 9px 13px;
+      background: var(--surface);
+      color: var(--ink);
+      padding: 8px 13px;
       border-radius: var(--radius-sm);
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 600;
       font-family: inherit;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      transition: transform 0.12s ease, background 0.15s ease, opacity 0.15s ease;
+      gap: 5px;
+      transition: transform 0.16s var(--ease-spring), background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
     }
-    button:active { transform: scale(0.97); }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button:active {
+      transform: scale(0.95);
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
     button.primary {
-      background: linear-gradient(145deg, #10b981, #059669);
+      background: var(--ink);
       color: #ffffff;
-      border: none;
-      box-shadow: 0 6px 16px var(--mint-glow);
+      border-color: var(--ink);
     }
     button.ghost {
-      background: var(--surface-subtle);
+      background: var(--surface-soft);
       border-color: transparent;
-      color: var(--text-secondary);
+      color: var(--ink-secondary);
     }
+    button.ghost:active { background: var(--surface-hover); }
     button.danger {
       background: var(--danger-soft);
       border-color: transparent;
       color: var(--danger);
     }
     button.sm {
-      padding: 6px 11px;
-      font-size: 12.5px;
-      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 9px;
     }
     button.icon-only {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       padding: 0;
-      border-radius: 12px;
+      border-radius: 10px;
     }
 
+    /* Segmented Control (Replaces ugly checkbox!) */
+    .segmented {
+      position: relative;
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--surface-hover);
+      padding: 3px;
+      border-radius: 11px;
+      min-width: 154px;
+    }
+    .seg-thumb {
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      left: 3px;
+      width: calc(50% - 3px);
+      background: var(--surface);
+      border-radius: 8.5px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      transition: transform 0.24s var(--ease-spring);
+      pointer-events: none;
+    }
+    .segmented.right .seg-thumb {
+      transform: translateX(100%);
+    }
+    .seg-btn {
+      position: relative;
+      z-index: 1;
+      border: none;
+      background: transparent;
+      color: var(--ink-secondary);
+      padding: 6px 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: 8.5px;
+    }
+    .seg-btn:active { transform: none; }
+    .seg-btn.active { color: var(--ink); }
+
     /* Form Controls */
-    input, textarea, select {
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    input[type="url"],
+    textarea,
+    select {
       width: 100%;
-      padding: 11px 13px;
-      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border: 1px solid var(--border-strong);
       border-radius: var(--radius-sm);
-      font-size: 14.5px;
-      background: rgba(255, 255, 255, 0.92);
-      color: var(--text);
+      font-size: 14px;
+      background: var(--surface);
+      color: var(--ink);
       margin-top: 6px;
       font-family: inherit;
       outline: none;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     input:focus, textarea:focus, select:focus {
-      border-color: var(--mint);
-      box-shadow: 0 0 0 3px var(--mint-soft);
+      border-color: var(--ink);
+      box-shadow: 0 0 0 3px rgba(17, 19, 21, 0.08);
     }
-    textarea { min-height: 82px; resize: vertical; }
+    textarea { min-height: 78px; resize: vertical; }
     label.field-label {
       display: block;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
-      color: var(--text-secondary);
+      color: var(--ink-secondary);
       margin-top: 13px;
     }
     .field-help {
@@ -338,39 +372,143 @@
       line-height: 1.45;
     }
 
+    /* Accordion / Collapsible Guide */
+    .accordion {
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      overflow: hidden;
+    }
+    .accordion-head {
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink-secondary);
+      border-radius: 0;
+    }
+    .accordion-head:active { transform: none; background: var(--surface-hover); }
+    .accordion-chevron { transition: transform 0.24s var(--ease-spring); }
+    .accordion.open .accordion-chevron { transform: rotate(180deg); }
+    .accordion-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.25s var(--ease-spring);
+    }
+    .accordion.open .accordion-body { grid-template-rows: 1fr; }
+    .accordion-inner {
+      overflow: hidden;
+      padding: 0 12px;
+      font-size: 12.5px;
+      color: var(--ink-secondary);
+      line-height: 1.6;
+    }
+    .accordion.open .accordion-inner { padding: 0 12px 12px; }
+
     /* iOS Switch */
     .switch {
       position: relative;
       display: inline-block;
-      width: 46px;
-      height: 27px;
+      width: 44px;
+      height: 26px;
       flex-shrink: 0;
     }
-    .switch input { opacity: 0; width: 0; height: 0; margin: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; margin: 0; position: absolute; }
     .slider {
       position: absolute;
       cursor: pointer;
       inset: 0;
-      background: #d5e0dc;
+      background: #d1d5db;
       border-radius: 999px;
       transition: background 0.22s ease;
     }
     .slider:before {
       position: absolute;
       content: "";
-      height: 21px;
-      width: 21px;
+      height: 20px;
+      width: 20px;
       left: 3px;
       bottom: 3px;
       background: #ffffff;
       border-radius: 50%;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.14);
-      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
+      transition: transform 0.24s var(--ease-spring);
     }
-    input:checked + .slider { background: var(--mint); }
-    input:checked + .slider:before { transform: translateX(19px); }
+    input:checked + .slider { background: var(--ink); }
+    input:checked + .slider:before { transform: translateX(18px); }
 
-    /* Lists & Logs */
+    /* Provider Groups & Quota Bar */
+    .group-block { margin-bottom: 16px; }
+    .group-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px 8px;
+    }
+    .group-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .quota-wrap {
+      margin-top: 10px;
+      padding-top: 9px;
+      border-top: 1px solid var(--border);
+    }
+    .quota-bar-bg {
+      height: 5px;
+      border-radius: 999px;
+      background: var(--surface-hover);
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .quota-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--ink);
+      transition: width 0.35s var(--ease-spring);
+    }
+    .quota-bar-fill.warn { background: var(--pro); }
+    .quota-bar-fill.full { background: var(--danger); }
+
+    /* Model Picker Chips */
+    .model-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      max-height: 130px;
+      overflow-y: auto;
+      padding: 8px;
+      background: var(--surface-soft);
+      border-radius: var(--radius-sm);
+    }
+    .model-chip {
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--ink-secondary);
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 500;
+    }
+    .model-chip.selected {
+      background: var(--ink);
+      color: #ffffff;
+      border-color: var(--ink);
+    }
+
+    /* Lists & Error Box */
     .list-row {
       padding: 11px 0;
       border-bottom: 1px solid var(--border);
@@ -381,18 +519,28 @@
     .err-box {
       margin-top: 8px;
       padding: 9px 11px;
-      border-radius: 11px;
-      background: rgba(254, 242, 242, 0.9);
-      border: 1px solid rgba(225, 29, 72, 0.16);
-      color: #9f1239;
+      border-radius: 10px;
+      background: var(--danger-soft);
+      border: 1px solid rgba(220, 38, 38, 0.14);
+      color: #991b1b;
       font-family: ui-monospace, "SF Mono", Menlo, monospace;
       font-size: 12px;
       line-height: 1.45;
       white-space: pre-wrap;
       word-break: break-all;
     }
+    .reply-box {
+      margin-top: 8px;
+      padding: 9px 11px;
+      border-radius: 10px;
+      background: var(--ok-soft);
+      border: 1px solid rgba(22, 163, 74, 0.16);
+      color: #166534;
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
 
-    /* Floating Glass Bottom Tab Bar */
+    /* Floating Bottom Nav */
     .nav-wrap {
       position: fixed;
       left: 0;
@@ -407,14 +555,14 @@
     nav.bottom-nav {
       pointer-events: auto;
       width: 100%;
-      max-width: 440px;
-      background: rgba(255, 255, 255, 0.84);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border: 1px solid var(--border-glass);
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border: 1px solid var(--border);
       box-shadow: var(--shadow-float);
-      border-radius: 26px;
-      padding: 6px;
+      border-radius: 24px;
+      padding: 5px;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 4px;
@@ -423,7 +571,7 @@
       border: none;
       background: transparent;
       color: var(--muted);
-      border-radius: 20px;
+      border-radius: 19px;
       padding: 8px 4px;
       display: flex;
       flex-direction: column;
@@ -431,44 +579,52 @@
       gap: 3px;
       font-size: 11px;
       font-weight: 600;
-      box-shadow: none;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.15s var(--ease-spring);
     }
+    .nav-btn:active { transform: scale(0.92); }
     .nav-btn.active {
-      background: var(--mint-soft);
-      color: var(--mint-deep);
+      background: var(--ink);
+      color: #ffffff;
     }
 
-    /* Modal Sheet */
+    /* Animated Modal Sheet */
     .modal-mask {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.32);
+      background: rgba(17, 19, 21, 0.36);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
       z-index: 50;
-      display: none;
+      display: flex;
       align-items: flex-end;
       justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
     }
-    .modal-mask.show { display: flex; }
+    .modal-mask.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
     .modal {
       width: 100%;
       max-width: 540px;
       max-height: 88vh;
       overflow-y: auto;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-radius: 26px 26px 0 0;
+      background: var(--surface);
+      border-radius: 24px 24px 0 0;
       padding: 18px 18px calc(24px + env(safe-area-inset-bottom, 0px));
-      box-shadow: 0 -8px 36px rgba(15, 23, 42, 0.14);
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
+      transform: translateY(28px);
+      transition: transform 0.28s var(--ease-spring);
     }
+    .modal-mask.show .modal { transform: translateY(0); }
     @media (min-width: 600px) {
       .modal-mask { align-items: center; padding: 16px; }
-      .modal { border-radius: 24px; padding: 22px; }
+      .modal { border-radius: 22px; padding: 22px; }
     }
 
-    /* Login Card */
+    /* Login */
     .login-shell {
       min-height: 100vh;
       display: flex;
@@ -478,59 +634,49 @@
     }
     #loginView {
       width: 100%;
-      max-width: 370px;
+      max-width: 360px;
       padding: 28px 22px;
       text-align: center;
     }
     .login-logo {
-      width: 52px;
-      height: 52px;
+      width: 48px;
+      height: 48px;
       margin: 0 auto 14px;
-      border-radius: 16px;
-      background: linear-gradient(145deg, #34d399, #059669);
-      color: #fff;
+      border-radius: 14px;
+      background: var(--ink);
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 10px 24px var(--mint-glow);
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: -0.04em;
     }
-
-    /* Filter Pill */
-    .filter-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--surface);
-      border: 1px solid var(--border-glass);
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      box-shadow: var(--shadow-card);
-      cursor: pointer;
-    }
-    .filter-pill input { width: auto; margin: 0; accent-color: var(--mint-deep); }
 
     /* Toast */
     .toast {
       position: fixed;
-      top: calc(18px + env(safe-area-inset-top, 0px));
+      top: calc(16px + env(safe-area-inset-top, 0px));
       left: 50%;
-      transform: translateX(-50%);
-      background: rgba(17, 24, 39, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      transform: translate(-50%, -10px);
+      background: var(--ink);
       color: #ffffff;
       padding: 9px 16px;
       border-radius: 999px;
       font-size: 13px;
       font-weight: 500;
       z-index: 99;
-      display: none;
+      opacity: 0;
+      pointer-events: none;
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+      transition: opacity 0.2s ease, transform 0.24s var(--ease-spring);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
     }
 
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .spin { animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
@@ -541,15 +687,13 @@
   <!-- 登录页 -->
   <div id="loginShell" class="login-shell" style="display:none;">
     <div id="loginView" class="card">
-      <div class="login-logo">
-        <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      </div>
-      <h2 style="margin:0 0 6px;font-size:20px;letter-spacing:-0.02em;">api77 控制面板</h2>
-      <p class="muted" style="margin:0 0 18px;">输入管理员密码进入私人反代中心</p>
+      <div class="login-logo">77</div>
+      <h2 style="margin:0 0 6px;font-size:20px;letter-spacing:-0.02em;">77api</h2>
+      <p class="muted" style="margin:0 0 18px;">输入管理员密码进入控制台</p>
       <input id="loginPwd" type="password" placeholder="管理员密码" onkeydown="if(event.key==='Enter') doLogin()" />
       <button class="primary" style="width:100%;margin-top:14px;padding:11px;" onclick="doLogin()">
         <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        登录面板
+        登录
       </button>
       <p id="loginErr" class="muted" style="color:var(--danger);margin:10px 0 0;"></p>
     </div>
@@ -559,12 +703,10 @@
   <div id="appView" style="display:none;">
     <header>
       <div class="brand">
-        <div class="brand-mark">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        </div>
+        <div class="brand-mark">77</div>
         <div>
-          <div class="brand-title">api77 Hub</div>
-          <div class="brand-sub"><span class="pulse-dot"></span>VPS 常驻运行中</div>
+          <div class="brand-title">77api</div>
+          <div class="brand-sub"><span class="status-dot"></span>常驻运行中</div>
         </div>
       </div>
       <button id="refreshBtn" class="icon-only ghost" onclick="refreshAll(true)" aria-label="刷新">
@@ -577,39 +719,19 @@
       <section id="page-dashboard" class="page active">
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-top">
-              <span>今日请求</span>
-              <span class="stat-icon">
-                <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-              </span>
-            </div>
+            <div class="stat-top"><span>今日请求</span><svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
             <div class="stat-val" id="st-today-req">0</div>
           </div>
           <div class="stat-card">
-            <div class="stat-top">
-              <span>总成功率</span>
-              <span class="stat-icon">
-                <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-              </span>
-            </div>
+            <div class="stat-top"><span>总成功率</span><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
             <div class="stat-val" id="st-rate">100%</div>
           </div>
           <div class="stat-card">
-            <div class="stat-top">
-              <span>累计 Token</span>
-              <span class="stat-icon">
-                <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M8.5 10.5L12 7l3.5 3.5"/></svg>
-              </span>
-            </div>
+            <div class="stat-top"><span>累计 Token</span><svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M8.5 10.5L12 7l3.5 3.5"/></svg></div>
             <div class="stat-val" id="st-tokens">0</div>
           </div>
           <div class="stat-card">
-            <div class="stat-top">
-              <span>启用渠道</span>
-              <span class="stat-icon">
-                <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/><circle cx="6" cy="6.5" r="0.8"/><circle cx="6" cy="17.5" r="0.8"/></svg>
-              </span>
-            </div>
+            <div class="stat-top"><span>启用账号</span><svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="7" rx="2"/><rect x="2" y="14" width="20" height="7" rx="2"/></svg></div>
             <div class="stat-val" id="st-channels">0 / 0</div>
           </div>
         </div>
@@ -617,17 +739,17 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">
-              <svg class="icon icon-sm" style="color:var(--mint-deep);" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              全前端通用接入（酒馆 / TT 酒馆 / 小手机）
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              通用接口配置
             </div>
-            <span class="badge badge-ok">OpenAI /v1</span>
+            <span class="badge badge-neutral">OpenAI /v1</span>
           </div>
 
           <div class="endpoint-box">
-            <div class="endpoint-label">API 接口地址（Base URL）</div>
+            <div class="endpoint-label">API 地址（Base URL）</div>
             <div class="row">
               <span class="mono" id="proxyBaseUrl"></span>
-              <button class="sm ghost" onclick="copyText(document.getElementById('proxyBaseUrl').textContent)">
+              <button class="sm" onclick="copyWithFeedback(document.getElementById('proxyBaseUrl').textContent, this)">
                 <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 复制
               </button>
@@ -638,10 +760,32 @@
             <div class="endpoint-label">对外总密钥（API Key）</div>
             <div class="row">
               <span class="mono" id="proxyApiKey"></span>
-              <button class="sm ghost" onclick="copyText(currentProxyKey)">
-                <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                复制
-              </button>
+              <div class="row-tight">
+                <button id="toggleKeyBtn" class="sm ghost" onclick="toggleProxyKeyVisible()" aria-label="显示或隐藏密钥">
+                  <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  显示
+                </button>
+                <button class="sm" onclick="copyWithFeedback(currentProxyKey, this)">
+                  <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  复制
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion" id="accFrontendGuide">
+            <button class="accordion-head" onclick="this.parentElement.classList.toggle('open')">
+              <span class="row-tight">
+                <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                酒馆 / TT 酒馆 / 小手机怎么填？
+              </span>
+              <svg class="icon icon-sm accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="accordion-body">
+              <div class="accordion-inner">
+                <div><strong>酒馆（SillyTavern）/ TT 酒馆（TauriTavern）</strong>：连接选「Chat Completion」→ 来源选「自定义（OpenAI 兼容）」→ 填入上面的 Base URL 和总密钥，点连接即可拉取模型。</div>
+                <div style="margin-top:6px;"><strong>小手机（HTML 前端）</strong>：在 API 设置里选 OpenAI 兼容格式，地址填上面带 <span class="mono">/v1</span> 的地址（部分小手机会自动补 /v1，如报错可去掉末尾 /v1 再试），密钥填上面的总密钥。</div>
+              </div>
             </div>
           </div>
         </div>
@@ -649,8 +793,8 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">
-              <svg class="icon icon-sm" style="color:var(--mint-deep);" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-              渠道调用分布
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              各账号调用统计
             </div>
           </div>
           <div id="channelStatsList" class="muted">暂无调用记录</div>
@@ -660,10 +804,10 @@
       <!-- 2. 渠道 -->
       <section id="page-channels" class="page">
         <div class="row" style="margin-bottom:13px;">
-          <span class="muted">管理已接入的反代模块与密钥</span>
+          <span class="muted">按反代类型分组管理所有账号</span>
           <button class="primary sm" onclick="openChannelModal()">
             <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            添加渠道
+            添加账号
           </button>
         </div>
         <div id="channelsList"></div>
@@ -672,43 +816,71 @@
       <!-- 3. 日志 -->
       <section id="page-logs" class="page">
         <div class="row" style="margin-bottom:13px;">
-          <label class="filter-pill">
-            <input id="onlyErrorsChk" type="checkbox" onchange="loadLogs()" />
-            只看报错
-          </label>
+          <div id="logSeg" class="segmented">
+            <div class="seg-thumb"></div>
+            <button id="segAll" class="seg-btn active" onclick="setLogFilter(false)">全部</button>
+            <button id="segErr" class="seg-btn" onclick="setLogFilter(true)">仅报错</button>
+          </div>
           <div class="row-tight">
             <button class="sm ghost" onclick="loadLogs()">
               <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
               刷新
             </button>
             <button class="sm danger" onclick="clearLogs()">
-              <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
               清空
             </button>
           </div>
         </div>
         <div class="card" id="logsList" style="padding:10px 16px;">
-          <div class="muted" style="padding:10px 0;">暂无日志</div>
+          <div class="muted" style="text-align:center;padding:18px 0;">暂无请求记录</div>
         </div>
       </section>
 
       <!-- 4. 设置 -->
       <section id="page-settings" class="page">
         <div class="card">
+          <div class="row">
+            <div>
+              <div class="card-title">故障自动切换备用账号</div>
+              <div class="muted" style="margin-top:3px;">开启后，某账号报错或限速时自动切同组下一个账号（含流式）</div>
+            </div>
+            <label class="switch">
+              <input id="failoverSwitch" type="checkbox" onchange="toggleFailover(this.checked)" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
           <div class="card-header">
             <div class="card-title">
-              <svg class="icon icon-sm" style="color:var(--mint-deep);" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-              重置对外总 API Key
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+              重置对外总密钥
             </div>
           </div>
-          <p class="muted" style="margin:0 0 12px;">重新生成后，旧密钥会立即失效，请同步更新各前端里的配置。</p>
+          <p class="muted" style="margin:0 0 12px;">重置后旧密钥会立即失效，需要同步更新前端里的 API Key。</p>
           <button class="danger sm" onclick="rotateProxyKey()">重新生成总密钥</button>
         </div>
 
         <div class="card">
           <div class="card-header">
             <div class="card-title">
-              <svg class="icon icon-sm" style="color:var(--mint-deep);" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              配置备份与恢复
+            </div>
+          </div>
+          <div class="row-tight">
+            <button class="sm" onclick="exportBackup()">导出 JSON 备份</button>
+            <button class="sm ghost" onclick="document.getElementById('importFile').click()">导入恢复</button>
+            <input id="importFile" type="file" accept="application/json" style="display:none;" onchange="importBackup(this)" />
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               修改面板登录密码
             </div>
           </div>
@@ -720,7 +892,7 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">
-              <svg class="icon icon-sm" style="color:var(--mint-deep);" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
               已加载的反代插件（providers/）
             </div>
           </div>
@@ -734,7 +906,7 @@
       </section>
     </main>
 
-    <!-- 悬浮毛玻璃底栏 -->
+    <!-- 底部悬浮导航 -->
     <div class="nav-wrap">
       <nav class="bottom-nav">
         <button class="nav-btn active" onclick="switchTab('dashboard', this)">
@@ -757,32 +929,89 @@
     </div>
   </div>
 
-  <!-- 新建 / 编辑渠道弹窗 -->
+  <!-- 新建 / 编辑账号弹窗 -->
   <div id="channelModal" class="modal-mask" onclick="if(event.target===this) closeChannelModal()">
     <div class="modal">
-      <div class="row" style="margin-bottom:8px;">
-        <strong id="modalTitle" style="font-size:16.5px;">添加渠道</strong>
+      <div class="row" style="margin-bottom:6px;">
+        <strong id="modalTitle" style="font-size:16.5px;">添加账号</strong>
         <button class="icon-only ghost" onclick="closeChannelModal()" aria-label="关闭">
           <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
       <input type="hidden" id="editChannelId" />
-      <label class="field-label">渠道名称</label>
-      <input id="chName" placeholder="例如：Google 官方池 / 本机 Kiro" />
 
-      <label class="field-label">反代插件类型</label>
+      <div class="grid-2">
+        <div>
+          <label class="field-label">账号备注名</label>
+          <input id="chName" placeholder="如：Kiro-主号 / AIS-1号" />
+        </div>
+        <div>
+          <label class="field-label">等级标签（可选）</label>
+          <input id="chTier" list="tierOptions" placeholder="Free / Pro / 备用" />
+          <datalist id="tierOptions">
+            <option value="Free"></option>
+            <option value="Pro"></option>
+            <option value="Plus"></option>
+            <option value="备用"></option>
+          </datalist>
+        </div>
+      </div>
+
+      <label class="field-label">反代类型</label>
       <select id="chType" onchange="renderDynamicFields()"></select>
-      <div id="chTypeDesc" class="field-help"></div>
+
+      <div class="accordion" id="accProviderGuide">
+        <button class="accordion-head" type="button" onclick="this.parentElement.classList.toggle('open')">
+          <span class="row-tight">
+            <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            不知道怎么填？点开看说明
+          </span>
+          <svg class="icon icon-sm accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="accordion-body">
+          <div class="accordion-inner" id="chTypeGuide"></div>
+        </div>
+      </div>
 
       <div id="dynamicFields"></div>
 
-      <label class="field-label">指定模型列表（逗号分隔，留空表示通配全部模型）</label>
-      <input id="chModels" placeholder="例如：gemini-2.5-flash,gemini-2.5-pro" />
+      <div class="row" style="margin-top:13px;">
+        <label class="field-label" style="margin:0;">可用模型（留空 = 全部通配）</label>
+        <button id="fetchModelsBtn" type="button" class="sm ghost" onclick="fetchModelsInModal()">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          拉取模型
+        </button>
+      </div>
+      <input id="chModels" placeholder="点击右侧拉取模型，或逗号分隔手填" />
+      <div id="fetchedModelsBox" style="display:none;"></div>
 
-      <label class="field-label">优先级（数字越大越优先）</label>
-      <input id="chPriority" type="number" value="10" />
+      <div class="grid-2">
+        <div>
+          <label class="field-label">额度上限（0 = 不限）</label>
+          <input id="chQuotaLimit" type="number" min="0" value="0" placeholder="如 Kiro 填 50" />
+        </div>
+        <div>
+          <label class="field-label">额度重置周期</label>
+          <select id="chQuotaCycle">
+            <option value="none">不自动重置</option>
+            <option value="monthly">每月重置</option>
+            <option value="daily">每日重置</option>
+          </select>
+        </div>
+      </div>
 
-      <button class="primary" style="width:100%;margin-top:18px;padding:12px;" onclick="saveChannel()">保存渠道</button>
+      <div class="grid-2">
+        <div>
+          <label class="field-label">当前已用次数</label>
+          <input id="chQuotaUsed" type="number" min="0" value="0" />
+        </div>
+        <div>
+          <label class="field-label">优先级（越大越先用）</label>
+          <input id="chPriority" type="number" value="10" />
+        </div>
+      </div>
+
+      <button class="primary" style="width:100%;margin-top:18px;padding:12px;" onclick="saveChannel()">保存账号</button>
     </div>
   </div>
 
@@ -791,29 +1020,65 @@
     let providers = [];
     let channelsCache = [];
     let currentProxyKey = "";
+    let showFullKey = false;
+    let onlyErrors = false;
+    let fetchedModelsList = [];
+
+    const GUIDES = {
+      kiro_native: "1. 填入你从 Kiro 提取的 GitHub/Google OAuth RefreshToken（aorAAAAAG... 开头）。<br>2. 区域默认留空即 us-east-1。<br>3. 免费号建议把下方「额度上限」填 50、重置周期选「每月重置」，等级标签填 Free。",
+      gemini_official: "1. 去 Google AI Studio 申请官方免费 AIza... 密钥，每行贴一把可自动轮询。<br>2. 接口地址留空即直连官方。<br>3. 等级标签可按账号填 Free 或 Pro，点击「拉取模型」可自动填入可用 Gemini 模型。",
+      openai_compat: "1. 填入任意兼容 OpenAI /v1 格式的接口地址（如 DeepSeek、NVIDIA NIM 或其他第三方反代）。<br>2. 密钥支持多行填入自动轮询。<br>3. 模型列表留空表示通配全部模型，也可点「拉取模型」精确勾选。"
+    };
 
     const ICONS = {
       zap: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+      chat: '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
       edit: '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
       trash: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>',
       check: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
-      alert: '<svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+      alert: '<svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+      plus: '<svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
     };
 
     function toast(msg) {
       const el = document.getElementById("toast");
       el.textContent = msg;
-      el.style.display = "block";
+      el.classList.add("show");
       clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => { el.style.display = "none"; }, 2200);
+      window.__toastTimer = setTimeout(() => el.classList.remove("show"), 2200);
     }
 
-    async function copyText(text) {
+    // 兼容 HTTP 和 iPhone Safari 的可靠复制函数
+    async function copyWithFeedback(text, btn) {
+      if (!text) { toast("内容为空"); return; }
+      let ok = false;
       try {
-        await navigator.clipboard.writeText(text);
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          ok = true;
+        }
+      } catch {}
+      if (!ok) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, text.length);
+        try { ok = document.execCommand("copy"); } catch {}
+        document.body.removeChild(ta);
+      }
+      if (ok) {
         toast("已复制到剪贴板");
-      } catch {
-        toast("复制失败，请长按手动复制");
+        if (btn) {
+          const orig = btn.innerHTML;
+          btn.innerHTML = `${ICONS.check}已复制`;
+          setTimeout(() => { btn.innerHTML = orig; }, 1400);
+        }
+      } else {
+        toast("请点「显示」后长按手动复制");
       }
     }
 
@@ -864,6 +1129,21 @@
       if (name === "dashboard") loadStats();
     }
 
+    function renderProxyKey() {
+      const el = document.getElementById("proxyApiKey");
+      const btn = document.getElementById("toggleKeyBtn");
+      if (!currentProxyKey) { el.textContent = "未生成"; return; }
+      el.textContent = showFullKey ? currentProxyKey : (currentProxyKey.slice(0, 12) + "••••••••" + currentProxyKey.slice(-4));
+      btn.innerHTML = showFullKey
+        ? '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>隐藏'
+        : '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>显示';
+    }
+
+    function toggleProxyKeyVisible() {
+      showFullKey = !showFullKey;
+      renderProxyKey();
+    }
+
     async function showApp() {
       document.getElementById("loginShell").style.display = "none";
       document.getElementById("appView").style.display = "block";
@@ -877,7 +1157,7 @@
       try {
         await loadProviders();
         await Promise.all([loadStats(), loadChannels(), loadLogs()]);
-        if (manual) toast("已刷新最新状态");
+        if (manual) toast("已刷新");
       } finally {
         if (svg) setTimeout(() => svg.classList.remove("spin"), 280);
       }
@@ -892,11 +1172,11 @@
         `<div class="list-row">
           <div class="row">
             <strong style="font-size:13.5px;">${escapeHtml(p.label)}</strong>
-            <span class="badge badge-ok">${escapeHtml(p.provider_type)}</span>
+            <span class="badge badge-neutral">${escapeHtml(p.provider_type)}</span>
           </div>
           <div class="field-help">${escapeHtml(p.description)}</div>
         </div>`
-      ).join("") || "暂无已加载插件";
+      ).join("") || "暂无插件";
     }
 
     async function loadStats() {
@@ -906,7 +1186,8 @@
       document.getElementById("st-rate").textContent = s.success_rate + "%";
       document.getElementById("st-tokens").textContent = s.total_tokens.toLocaleString();
       document.getElementById("st-channels").textContent = `${s.channel_enabled} / ${s.channel_total}`;
-      document.getElementById("proxyApiKey").textContent = currentProxyKey ? (currentProxyKey.slice(0, 12) + "••••••••") : "未设置";
+      document.getElementById("failoverSwitch").checked = !!s.auto_failover;
+      renderProxyKey();
 
       const list = s.by_channel || [];
       document.getElementById("channelStatsList").innerHTML = list.length
@@ -920,44 +1201,97 @@
         : "暂无调用记录";
     }
 
+    function tierBadge(tier) {
+      if (!tier) return "";
+      const lower = tier.toLowerCase();
+      const cls = lower.includes("pro") || lower.includes("plus") ? "badge-pro" : lower.includes("free") ? "badge-ok" : "badge-neutral";
+      return `<span class="badge ${cls}">${escapeHtml(tier)}</span>`;
+    }
+
+    function cycleText(cycle) {
+      if (cycle === "monthly") return "本月";
+      if (cycle === "daily") return "今日";
+      return "累计";
+    }
+
     async function loadChannels() {
       const data = await api("/api/channels");
       channelsCache = data.channels || [];
       const container = document.getElementById("channelsList");
       if (!channelsCache.length) {
-        container.innerHTML = `<div class="card muted" style="text-align:center;padding:28px 16px;">还没有配置任何渠道，点击右上角「添加渠道」开始接入</div>`;
+        container.innerHTML = `<div class="card muted" style="text-align:center;padding:30px 16px;">还没有配置账号，点右上角「添加账号」开始</div>`;
         return;
       }
-      container.innerHTML = channelsCache.map(ch => {
-        const badge = ch.last_status === "ok"
-          ? `<span class="badge badge-ok">${ICONS.check}正常 ${ch.last_latency_ms}ms</span>`
-          : ch.last_status === "error"
-            ? `<span class="badge badge-err">${ICONS.alert}异常</span>`
-            : `<span class="badge badge-neutral">未测速</span>`;
-        const errHtml = ch.last_error ? `<div class="err-box">${escapeHtml(ch.last_error)}</div>` : "";
-        return `<div class="card">
-          <div class="row">
-            <div class="row-tight">
-              <strong style="font-size:15px;">${escapeHtml(ch.name)}</strong>
-              <span class="badge badge-neutral">${escapeHtml(ch.provider_type)}</span>
+
+      // 按 provider_type 分组展示
+      const groups = {};
+      for (const ch of channelsCache) {
+        if (!groups[ch.provider_type]) groups[ch.provider_type] = [];
+        groups[ch.provider_type].push(ch);
+      }
+
+      container.innerHTML = Object.entries(groups).map(([ptype, list]) => {
+        const pMeta = providers.find(p => p.provider_type === ptype);
+        const gLabel = pMeta ? pMeta.label : ptype;
+        const cardsHtml = list.map(ch => {
+          const statusBadge = ch.last_status === "ok"
+            ? `<span class="badge badge-ok">${ICONS.check}${ch.last_latency_ms}ms</span>`
+            : ch.last_status === "error"
+              ? `<span class="badge badge-err">${ICONS.alert}异常</span>`
+              : `<span class="badge badge-neutral">未测速</span>`;
+          const errHtml = ch.last_error ? `<div class="err-box">${escapeHtml(ch.last_error)}</div>` : "";
+
+          let quotaHtml = "";
+          if (ch.quota_limit > 0) {
+            const pct = Math.min(100, Math.round((ch.quota_used / ch.quota_limit) * 100));
+            const fillCls = pct >= 100 ? "full" : pct >= 80 ? "warn" : "";
+            quotaHtml = `<div class="quota-wrap">
+              <div class="row">
+                <span class="muted">${cycleText(ch.quota_cycle)}额度：<strong style="color:var(--ink);">${ch.quota_used} / ${ch.quota_limit}</strong></span>
+                <button class="sm ghost" onclick="calibrateQuota(${ch.id}, ${ch.quota_used}, ${ch.quota_limit})">校准</button>
+              </div>
+              <div class="quota-bar-bg"><div class="quota-bar-fill ${fillCls}" style="width:${pct}%"></div></div>
+            </div>`;
+          }
+
+          return `<div class="card" id="ch-card-${ch.id}">
+            <div class="row">
+              <div class="row-tight">
+                <strong style="font-size:15px;">${escapeHtml(ch.name)}</strong>
+                ${tierBadge(ch.tier)}
+              </div>
+              <label class="switch">
+                <input type="checkbox" ${ch.enabled ? "checked" : ""} onchange="toggleChannel(${ch.id}, this.checked)" />
+                <span class="slider"></span>
+              </label>
             </div>
-            <label class="switch">
-              <input type="checkbox" ${ch.enabled ? "checked" : ""} onchange="toggleChannel(${ch.id}, this.checked)" />
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="muted" style="margin:8px 0 12px;">
-            模型：${ch.models ? escapeHtml(ch.models) : "全部通配 (*)"} · 优先级 ${ch.priority}
-          </div>
-          <div class="row">
-            <div>${badge}</div>
-            <div class="row-tight">
-              <button class="sm ghost" onclick="testChannel(${ch.id}, this)">${ICONS.zap}测速</button>
-              <button class="sm ghost" onclick="openChannelModal(${ch.id})">${ICONS.edit}编辑</button>
-              <button class="sm danger" onclick="deleteChannel(${ch.id})">${ICONS.trash}</button>
+            <div class="muted" style="margin:6px 0 4px;">
+              凭证：<span class="mono">${escapeHtml(ch.credential_hint || "-")}</span> · 优先级 ${ch.priority}
             </div>
+            <div class="muted" style="margin-bottom:10px;">
+              模型：${ch.models ? escapeHtml(ch.models) : "全部通配 (*)"}
+            </div>
+            <div class="row">
+              <div>${statusBadge}</div>
+              <div class="row-tight">
+                <button class="sm ghost" onclick="testChannel(${ch.id}, this)">${ICONS.zap}测速</button>
+                <button class="sm ghost" onclick="chatTestChannel(${ch.id}, this)">${ICONS.chat}试聊</button>
+                <button class="sm ghost" onclick="openChannelModal(${ch.id})">${ICONS.edit}编辑</button>
+                <button class="sm danger" onclick="deleteChannel(${ch.id})">${ICONS.trash}</button>
+              </div>
+            </div>
+            ${quotaHtml}
+            <div id="ch-reply-${ch.id}"></div>
+            ${errHtml}
+          </div>`;
+        }).join("");
+
+        return `<div class="group-block">
+          <div class="group-head">
+            <div class="group-title">${escapeHtml(gLabel)} <span class="badge badge-neutral">${list.length} 个账号</span></div>
+            <button class="sm ghost" onclick="openChannelModal(null, '${ptype}')">${ICONS.plus}加同款账号</button>
           </div>
-          ${errHtml}
+          ${cardsHtml}
         </div>`;
       }).join("");
     }
@@ -965,7 +1299,7 @@
     function renderDynamicFields(values = {}) {
       const ptype = document.getElementById("chType").value;
       const p = providers.find(x => x.provider_type === ptype);
-      document.getElementById("chTypeDesc").textContent = p ? p.description : "";
+      document.getElementById("chTypeGuide").innerHTML = GUIDES[ptype] || (p ? escapeHtml(p.description) : "");
       const box = document.getElementById("dynamicFields");
       if (!p) { box.innerHTML = ""; return; }
       box.innerHTML = p.fields.map(f => {
@@ -979,21 +1313,34 @@
       }).join("");
     }
 
-    function openChannelModal(id = null) {
+    function openChannelModal(id = null, presetType = null) {
       document.getElementById("editChannelId").value = id || "";
+      document.getElementById("fetchedModelsBox").style.display = "none";
+      document.getElementById("accProviderGuide").classList.remove("open");
+      fetchedModelsList = [];
       if (id) {
         const ch = channelsCache.find(c => c.id === id);
-        document.getElementById("modalTitle").textContent = "编辑渠道";
+        document.getElementById("modalTitle").textContent = "编辑账号";
         document.getElementById("chName").value = ch.name;
+        document.getElementById("chTier").value = ch.tier || "";
         document.getElementById("chType").value = ch.provider_type;
         document.getElementById("chModels").value = ch.models || "";
         document.getElementById("chPriority").value = ch.priority;
+        document.getElementById("chQuotaLimit").value = ch.quota_limit || 0;
+        document.getElementById("chQuotaUsed").value = ch.quota_used || 0;
+        document.getElementById("chQuotaCycle").value = ch.quota_cycle || "none";
         renderDynamicFields(ch.config || {});
       } else {
-        document.getElementById("modalTitle").textContent = "添加渠道";
+        document.getElementById("modalTitle").textContent = "添加账号";
         document.getElementById("chName").value = "";
+        document.getElementById("chTier").value = "";
+        if (presetType) document.getElementById("chType").value = presetType;
         document.getElementById("chModels").value = "";
         document.getElementById("chPriority").value = 10;
+        const t = document.getElementById("chType").value;
+        document.getElementById("chQuotaLimit").value = t === "kiro_native" ? 50 : 0;
+        document.getElementById("chQuotaCycle").value = t === "kiro_native" ? "monthly" : "none";
+        document.getElementById("chQuotaUsed").value = 0;
         renderDynamicFields({});
       }
       document.getElementById("channelModal").classList.add("show");
@@ -1003,27 +1350,86 @@
       document.getElementById("channelModal").classList.remove("show");
     }
 
-    async function saveChannel() {
-      const id = document.getElementById("editChannelId").value;
+    function collectConfig() {
       const config = {};
       document.querySelectorAll("[data-cfg-key]").forEach(el => {
         config[el.getAttribute("data-cfg-key")] = el.value.trim();
       });
+      return config;
+    }
+
+    async function fetchModelsInModal() {
+      const btn = document.getElementById("fetchModelsBtn");
+      btn.disabled = true;
+      btn.textContent = "拉取中...";
+      try {
+        const res = await api("/api/providers/fetch-models", {
+          method: "POST",
+          body: JSON.stringify({ provider_type: document.getElementById("chType").value, config: collectConfig() })
+        });
+        fetchedModelsList = res.models || [];
+        if (!fetchedModelsList.length) {
+          toast("未拉取到模型，请先检查凭证");
+          return;
+        }
+        renderFetchedModels();
+        toast(`拉取到 ${fetchedModelsList.length} 个模型`);
+      } catch (e) {
+        toast(e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>拉取模型';
+      }
+    }
+
+    function renderFetchedModels() {
+      const box = document.getElementById("fetchedModelsBox");
+      const current = new Set(document.getElementById("chModels").value.split(",").map(s => s.trim()).filter(Boolean));
+      box.style.display = "block";
+      box.innerHTML = `<div class="row" style="margin-top:8px;">
+          <span class="muted">点选要启用的模型</span>
+          <button type="button" class="sm ghost" onclick="selectAllFetchedModels()">全选</button>
+        </div>
+        <div class="model-chips">
+          ${fetchedModelsList.map(m => `<button type="button" class="model-chip ${current.has(m) ? 'selected' : ''}" onclick="toggleModelChip('${escapeHtml(m)}')">${escapeHtml(m)}</button>`).join("")}
+        </div>`;
+    }
+
+    function toggleModelChip(m) {
+      const current = document.getElementById("chModels").value.split(",").map(s => s.trim()).filter(Boolean);
+      const idx = current.indexOf(m);
+      if (idx >= 0) current.splice(idx, 1);
+      else current.push(m);
+      document.getElementById("chModels").value = current.join(",");
+      renderFetchedModels();
+    }
+
+    function selectAllFetchedModels() {
+      document.getElementById("chModels").value = fetchedModelsList.join(",");
+      renderFetchedModels();
+    }
+
+    async function saveChannel() {
+      const id = document.getElementById("editChannelId").value;
       const payload = {
         name: document.getElementById("chName").value.trim(),
+        tier: document.getElementById("chTier").value.trim(),
         provider_type: document.getElementById("chType").value,
         models: document.getElementById("chModels").value.trim(),
         priority: parseInt(document.getElementById("chPriority").value || "10", 10),
+        quota_limit: parseInt(document.getElementById("chQuotaLimit").value || "0", 10),
+        quota_used: parseInt(document.getElementById("chQuotaUsed").value || "0", 10),
+        quota_cycle: document.getElementById("chQuotaCycle").value,
         enabled: true,
-        config,
+        config: collectConfig(),
       };
       try {
         if (id) {
           await api(`/api/channels/${id}`, { method: "PUT", body: JSON.stringify(payload) });
-          toast("渠道已更新");
+          toast("账号已更新");
         } else {
           await api("/api/channels", { method: "POST", body: JSON.stringify(payload) });
-          toast("渠道已添加");
+          toast("账号已添加");
         }
         closeChannelModal();
         await Promise.all([loadChannels(), loadStats()]);
@@ -1032,20 +1438,30 @@
       }
     }
 
+    async function calibrateQuota(id, used, limit) {
+      const val = prompt(`输入当前已用次数（上限 ${limit}）：`, String(used));
+      if (val === null) return;
+      const n = parseInt(val, 10);
+      if (isNaN(n) || n < 0) { toast("请输入有效数字"); return; }
+      await api(`/api/channels/${id}/quota`, { method: "PATCH", body: JSON.stringify({ quota_used: n }) });
+      toast("已校准额度");
+      loadChannels();
+    }
+
     async function toggleChannel(id, enabled) {
       try {
         await api(`/api/channels/${id}/toggle`, { method: "PATCH", body: JSON.stringify({ enabled }) });
-        toast(enabled ? "已开启渠道" : "已关闭渠道");
+        toast(enabled ? "已开启账号" : "已关闭账号");
         loadStats();
       } catch (e) { toast(e.message); }
     }
 
     async function testChannel(id, btn) {
       btn.disabled = true;
-      btn.innerHTML = "测试中...";
+      btn.textContent = "测速中...";
       try {
         const res = await api(`/api/channels/${id}/test`, { method: "POST" });
-        toast(res.ok ? `连通正常 (${res.latency_ms}ms)` : "连通失败，请看卡片报错");
+        toast(res.ok ? `连通正常 (${res.latency_ms}ms)` : "连通失败，请看报错");
         await loadChannels();
       } catch (e) {
         toast(e.message);
@@ -1055,20 +1471,48 @@
       }
     }
 
+    async function chatTestChannel(id, btn) {
+      btn.disabled = true;
+      btn.textContent = "试聊中...";
+      try {
+        const res = await api(`/api/channels/${id}/chat-test`, { method: "POST" });
+        const box = document.getElementById(`ch-reply-${id}`);
+        if (res.ok) {
+          toast(`回复成功 (${res.latency_ms}ms)`);
+          if (box) box.innerHTML = `<div class="reply-box"><strong>${escapeHtml(res.model)}</strong> (${res.latency_ms}ms)：${escapeHtml(res.reply)}</div>`;
+        } else {
+          toast("试聊失败");
+          if (box) box.innerHTML = `<div class="err-box">${escapeHtml(res.error)}</div>`;
+        }
+      } catch (e) {
+        toast(e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `${ICONS.chat}试聊`;
+      }
+    }
+
     async function deleteChannel(id) {
-      if (!confirm("确定删除这个渠道吗？")) return;
+      if (!confirm("确定删除这个账号吗？")) return;
       await api(`/api/channels/${id}`, { method: "DELETE" });
-      toast("已删除渠道");
+      toast("已删除");
       await Promise.all([loadChannels(), loadStats()]);
     }
 
+    function setLogFilter(errOnly) {
+      onlyErrors = errOnly;
+      document.getElementById("logSeg").classList.toggle("right", errOnly);
+      document.getElementById("segAll").classList.toggle("active", !errOnly);
+      document.getElementById("segErr").classList.toggle("active", errOnly);
+      loadLogs();
+    }
+
     async function loadLogs() {
-      const onlyErr = document.getElementById("onlyErrorsChk").checked;
-      const data = await api(`/api/logs?limit=80&only_errors=${onlyErr}`);
+      const data = await api(`/api/logs?limit=80&only_errors=${onlyErrors}`);
       const logs = data.logs || [];
       const box = document.getElementById("logsList");
       if (!logs.length) {
-        box.innerHTML = `<div class="muted" style="text-align:center;padding:20px 0;">暂无请求记录</div>`;
+        box.innerHTML = `<div class="muted" style="text-align:center;padding:18px 0;">暂无请求记录</div>`;
         return;
       }
       box.innerHTML = logs.map(l => {
@@ -1096,12 +1540,43 @@
       await Promise.all([loadLogs(), loadStats()]);
     }
 
+    async function toggleFailover(enabled) {
+      await api("/api/settings/failover", { method: "POST", body: JSON.stringify({ enabled }) });
+      toast(enabled ? "已开启自动切换备用账号" : "已关闭自动切换");
+    }
+
     async function rotateProxyKey() {
       if (!confirm("确定重新生成对外总密钥？旧密钥会立即失效。")) return;
       const res = await api("/api/settings/rotate-proxy-key", { method: "POST" });
       currentProxyKey = res.proxy_api_key;
-      toast("已生成新密钥，请同步更新前端配置");
-      loadStats();
+      showFullKey = true;
+      renderProxyKey();
+      toast("已生成新密钥，请同步更新前端");
+    }
+
+    async function exportBackup() {
+      const data = await api("/api/backup/export");
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `77api-backup-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      toast("已导出备份文件");
+    }
+
+    async function importBackup(input) {
+      const file = input.files[0];
+      if (!file) return;
+      try {
+        const parsed = JSON.parse(await file.text());
+        const res = await api("/api/backup/import", { method: "POST", body: JSON.stringify({ channels: parsed.channels || [], replace: false }) });
+        toast(`已导入 ${res.imported} 个账号`);
+        await refreshAll(false);
+      } catch (e) {
+        toast("导入失败：" + e.message);
+      } finally {
+        input.value = "";
+      }
     }
 
     async function changePassword() {
