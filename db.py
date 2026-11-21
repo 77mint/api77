@@ -16,6 +16,40 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
 
+def _cycle_key(cycle: str) -> str:
+    now = datetime.now(timezone.utc)
+    if cycle == "daily":
+        return now.strftime("%Y-%m-%d")
+    if cycle == "monthly":
+        return now.strftime("%Y-%m")
+    return ""
+
+
+def _mask_secret(val: str) -> str:
+    val = (val or "").strip()
+    if not val:
+        return ""
+    first = val.splitlines()[0].strip()
+    if len(first) <= 8:
+        return first[:2] + "••••"
+    return f"{first[:4]}••••{first[-4:]}"
+
+
+def _extract_credential_hint(config: Dict[str, Any]) -> str:
+    for k in ("refresh_token", "api_keys", "api_key", "token"):
+        v = str(config.get(k) or "").strip()
+        if v:
+            lines = [x.strip() for x in v.replace(",", "\n").splitlines() if x.strip()]
+            hint = _mask_secret(lines[0])
+            if len(lines) > 1:
+                return f"{hint} 等 {len(lines)} 把"
+            return hint
+    base = str(config.get("base_url") or "").strip()
+    if base:
+        return base.replace("https://", "").replace("http://", "")[:28]
+    return "未填写凭证"
+
+
 def hash_password(password: str, salt: Optional[str] = None) -> str:
     salt = salt or secrets.token_hex(16)
     digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt.encode("utf-8"), 120000).hex()
@@ -42,6 +76,12 @@ def get_conn():
         conn.close()
 
 
+def _ensure_column(conn: sqlite3.Connection, table: str, col: str, ddl: str) -> None:
+    cols = {r["name"] for r in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+    if col not in cols:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}")
+
+
 def init_db() -> Dict[str, str]:
     with get_conn() as conn:
         conn.executescript(
@@ -59,6 +99,11 @@ def init_db() -> Dict[str, str]:
                 priority INTEGER NOT NULL DEFAULT 10,
                 models TEXT NOT NULL DEFAULT '',
                 config_json TEXT NOT NULL DEFAULT '{}',
+                tier TEXT NOT NULL DEFAULT '',
+                quota_limit INTEGER NOT NULL DEFAULT 0,
+                quota_used INTEGER NOT NULL DEFAULT 0,
+                quota_cycle TEXT NOT NULL DEFAULT 'none',
+                quota_reset_key TEXT NOT NULL DEFAULT '',
                 last_status TEXT DEFAULT '',
                 last_latency_ms INTEGER DEFAULT 0,
                 last_error TEXT DEFAULT '',
@@ -88,10 +133,15 @@ def init_db() -> Dict[str, str]:
             """
         )
 
-        # Initialize admin password and proxy API key if absent
+        # Safe migration for existing databases
+        _ensure_column(conn, "channels", "tier", "TEXT NOT NULL DEFAULT ''")
+        _ensure_column(conn, "channels", "quota_limit", "INTEGER NOT NULL DEFAULT 0")
+        _ensure_column(conn, "channels", "quota_used", "INTEGER NOT NULL DEFAULT 0")
+        _ensure_column(conn, "channels", "quota_cycle", "TEXT NOT NULL DEFAULT 'none'")
+        _ensure_column(conn, "channels", "quota_reset_key", "TEXT NOT NULL DEFAULT ''")
+
         created_info: Dict[str, str] = {}
-        row = conn.execute("SELECT value FROM settings WHERE key='admin_password_hash'").fetchone()
-        if not row:
+        if not conn.execute("SELECT value FROM settings WHERE key='admin_password_hash'").fetchone():
             default_pwd = os.getenv("ADMIN_PASSWORD", "admin123456")
             conn.execute(
                 "INSERT INTO settings(key, value) VALUES (?, ?)",
@@ -99,21 +149,22 @@ def init_db() -> Dict[str, str]:
             )
             created_info["initial_admin_password"] = default_pwd
 
-        row = conn.execute("SELECT value FROM settings WHERE key='proxy_api_key'").fetchone()
-        if not row:
-            default_key = os.getenv("PROXY_API_KEY", f"sk-hub-{secrets.token_urlsafe(24)}")
+        if not conn.execute("SELECT value FROM settings WHERE key='proxy_api_key'").fetchone():
+            default_key = os.getenv("PROXY_API_KEY", f"sk-77api-{secrets.token_urlsafe(24)}")
             conn.execute(
                 "INSERT INTO settings(key, value) VALUES (?, ?)",
                 ("proxy_api_key", default_key),
             )
             created_info["initial_proxy_api_key"] = default_key
 
-        row = conn.execute("SELECT value FROM settings WHERE key='session_secret'").fetchone()
-        if not row:
+        if not conn.execute("SELECT value FROM settings WHERE key='session_secret'").fetchone():
             conn.execute(
                 "INSERT INTO settings(key, value) VALUES (?, ?)",
                 ("session_secret", secrets.token_hex(32)),
             )
+
+        if not conn.execute("SELECT value FROM settings WHERE key='auto_failover'").fetchone():
+            conn.execute("INSERT INTO settings(key, value) VALUES ('auto_failover', '1')")
 
         return created_info
 
@@ -132,6 +183,26 @@ def set_setting(key: str, value: str) -> None:
         )
 
 
+def _hydrate_channel(r: sqlite3.Row, conn: sqlite3.Connection) -> Dict[str, Any]:
+    item = dict(r)
+    item["enabled"] = bool(item["enabled"])
+    item["config"] = json.loads(item.pop("config_json") or "{}")
+    item["model_list"] = [m.strip() for m in (item["models"] or "").split(",") if m.strip()]
+    item["credential_hint"] = _extract_credential_hint(item["config"])
+
+    # Auto-reset quota counter if cycle rolled over
+    cycle = item.get("quota_cycle") or "none"
+    cur_key = _cycle_key(cycle)
+    if cur_key and item.get("quota_reset_key") != cur_key:
+        item["quota_used"] = 0
+        item["quota_reset_key"] = cur_key
+        conn.execute(
+            "UPDATE channels SET quota_used=0, quota_reset_key=? WHERE id=?",
+            (cur_key, item["id"]),
+        )
+    return item
+
+
 def list_channels(only_enabled: bool = False) -> List[Dict[str, Any]]:
     query = "SELECT * FROM channels"
     if only_enabled:
@@ -139,14 +210,7 @@ def list_channels(only_enabled: bool = False) -> List[Dict[str, Any]]:
     query += " ORDER BY priority DESC, id ASC"
     with get_conn() as conn:
         rows = conn.execute(query).fetchall()
-        result = []
-        for r in rows:
-            item = dict(r)
-            item["enabled"] = bool(item["enabled"])
-            item["config"] = json.loads(item.pop("config_json") or "{}")
-            item["model_list"] = [m.strip() for m in (item["models"] or "").split(",") if m.strip()]
-            result.append(item)
-        return result
+        return [_hydrate_channel(r, conn) for r in rows]
 
 
 def get_channel(channel_id: int) -> Optional[Dict[str, Any]]:
@@ -154,11 +218,7 @@ def get_channel(channel_id: int) -> Optional[Dict[str, Any]]:
         r = conn.execute("SELECT * FROM channels WHERE id=?", (channel_id,)).fetchone()
         if not r:
             return None
-        item = dict(r)
-        item["enabled"] = bool(item["enabled"])
-        item["config"] = json.loads(item.pop("config_json") or "{}")
-        item["model_list"] = [m.strip() for m in (item["models"] or "").split(",") if m.strip()]
-        return item
+        return _hydrate_channel(r, conn)
 
 
 def create_channel(
@@ -168,15 +228,38 @@ def create_channel(
     models: str = "",
     enabled: bool = True,
     priority: int = 10,
+    tier: str = "",
+    quota_limit: int = 0,
+    quota_used: int = 0,
+    quota_cycle: str = "none",
 ) -> int:
     now = _utc_now()
+    reset_key = _cycle_key(quota_cycle)
     with get_conn() as conn:
         cur = conn.execute(
             """
-            INSERT INTO channels (name, provider_type, enabled, priority, models, config_json, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO channels (
+                name, provider_type, enabled, priority, models, config_json,
+                tier, quota_limit, quota_used, quota_cycle, quota_reset_key,
+                created_at, updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (name, provider_type, 1 if enabled else 0, priority, models, json.dumps(config, ensure_ascii=False), now, now),
+            (
+                name,
+                provider_type,
+                1 if enabled else 0,
+                priority,
+                models,
+                json.dumps(config, ensure_ascii=False),
+                tier.strip(),
+                max(0, int(quota_limit or 0)),
+                max(0, int(quota_used or 0)),
+                quota_cycle or "none",
+                reset_key,
+                now,
+                now,
+            ),
         )
         return int(cur.lastrowid)
 
@@ -189,16 +272,23 @@ def update_channel(
     models: Optional[str] = None,
     enabled: Optional[bool] = None,
     priority: Optional[int] = None,
+    tier: Optional[str] = None,
+    quota_limit: Optional[int] = None,
+    quota_used: Optional[int] = None,
+    quota_cycle: Optional[str] = None,
 ) -> bool:
     existing = get_channel(channel_id)
     if not existing:
         return False
     now = _utc_now()
+    new_cycle = quota_cycle if quota_cycle is not None else existing.get("quota_cycle", "none")
+    reset_key = _cycle_key(new_cycle) if quota_cycle is not None else existing.get("quota_reset_key", "")
     with get_conn() as conn:
         conn.execute(
             """
             UPDATE channels
-            SET name=?, provider_type=?, enabled=?, priority=?, models=?, config_json=?, updated_at=?
+            SET name=?, provider_type=?, enabled=?, priority=?, models=?, config_json=?,
+                tier=?, quota_limit=?, quota_used=?, quota_cycle=?, quota_reset_key=?, updated_at=?
             WHERE id=?
             """,
             (
@@ -208,11 +298,29 @@ def update_channel(
                 priority if priority is not None else existing["priority"],
                 models if models is not None else existing["models"],
                 json.dumps(config if config is not None else existing["config"], ensure_ascii=False),
+                tier.strip() if tier is not None else existing.get("tier", ""),
+                max(0, int(quota_limit)) if quota_limit is not None else int(existing.get("quota_limit", 0)),
+                max(0, int(quota_used)) if quota_used is not None else int(existing.get("quota_used", 0)),
+                new_cycle,
+                reset_key,
                 now,
                 channel_id,
             ),
         )
         return True
+
+
+def increment_channel_quota(channel_id: Optional[int], delta: int = 1) -> None:
+    if not channel_id:
+        return
+    ch = get_channel(channel_id)
+    if not ch:
+        return
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE channels SET quota_used = quota_used + ? WHERE id=?",
+            (delta, channel_id),
+        )
 
 
 def update_channel_health(channel_id: int, status: str, latency_ms: int, error: str = "") -> None:
@@ -272,13 +380,14 @@ def add_log(
                 (error_detail or "")[:4000],
             ),
         )
-        # Keep database compact on small VPS (retain latest 2000 logs)
         conn.execute(
             """
             DELETE FROM request_logs
             WHERE id NOT IN (SELECT id FROM request_logs ORDER BY id DESC LIMIT 2000)
             """
         )
+    if success and channel_id:
+        increment_channel_quota(channel_id, 1)
 
 
 def list_logs(limit: int = 80, only_errors: bool = False) -> List[Dict[str, Any]]:
