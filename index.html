@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>My Proxy Hub · 私人反代面板</title>
+  <style>
+    /* ========= 颜色与主题变量（在 GitHub 手机端直接改这里就能换肤） ========= */
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1b2430;
+      --muted: #667085;
+      --border: #e5e9f0;
+      --primary: #2563eb;
+      --primary-soft: #eff6ff;
+      --green: #16a34a;
+      --green-soft: #dcfce7;
+      --red: #dc2626;
+      --red-soft: #fee2e2;
+      --radius: 14px;
+      --shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 84px;
+    }
+
+    header {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { font-weight: 700; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); display: inline-block; }
+
+    main { max-width: 780px; margin: 0 auto; padding: 14px; }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .card-title { font-size: 15px; font-weight: 600; margin: 0 0 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .stat-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; box-shadow: var(--shadow); }
+    .stat-label { font-size: 12px; color: var(--muted); }
+    .stat-val { font-size: 22px; font-weight: 700; margin-top: 4px; }
+
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; word-break: break-all; }
+
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 999px;
+      font-size: 11.5px; font-weight: 600;
+    }
+    .badge-ok { background: var(--green-soft); color: var(--green); }
+    .badge-err { background: var(--red-soft); color: var(--red); }
+    .badge-info { background: var(--primary-soft); color: var(--primary); }
+
+    button {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    button.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    button.danger { color: var(--red); border-color: #fecaca; background: #fff5f5; }
+    button.sm { padding: 5px 10px; font-size: 12.5px; }
+    button:disabled { opacity: 0.55; }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--text);
+      margin-top: 5px;
+      font-family: inherit;
+    }
+    textarea { min-height: 76px; resize: vertical; }
+    label.field-label { display: block; font-size: 13px; font-weight: 600; margin-top: 12px; }
+    .field-help { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    /* Switch */
+    .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; margin: 0; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0; background: #cbd5e1;
+      border-radius: 24px; transition: .2s;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+      background: #fff; border-radius: 50%; transition: .2s;
+    }
+    input:checked + .slider { background: var(--green); }
+    input:checked + .slider:before { transform: translateX(18px); }
+
+    /* Log item */
+    .log-item { border-bottom: 1px solid var(--border); padding: 10px 0; }
+    .log-item:last-child { border-bottom: none; }
+    .err-box {
+      margin-top: 6px; padding: 8px 10px; border-radius: 8px;
+      background: #fff5f5; border: 1px solid #fecaca; color: #991b1b;
+      font-size: 12px; white-space: pre-wrap; word-break: break-all;
+    }
+
+    /* Bottom Nav */
+    nav.bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      padding: 6px 8px env(safe-area-inset-bottom, 10px);
+    }
+    .nav-btn {
+      border: none; background: transparent; color: var(--muted);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 6px 4px; font-size: 11.5px; font-weight: 600;
+    }
+    .nav-btn.active { color: var(--primary); }
+    .nav-icon { font-size: 18px; line-height: 1; }
+
+    /* Modal */
+    .modal-mask {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45);
+      z-index: 50; display: none; align-items: flex-end; justify-content: center;
+    }
+    .modal-mask.show { display: flex; }
+    .modal {
+      width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto;
+      background: var(--card); border-radius: 18px 18px 0 0; padding: 18px 16px 26px;
+    }
+    @media (min-width: 600px) {
+      .modal-mask { align-items: center; }
+      .modal { border-radius: 16px; }
+    }
+
+    /* Login Overlay */
+    #loginView {
+      max-width: 380px; margin: 14vh auto 0; padding: 22px;
+    }
+    .toast {
+      position: fixed; top: 64px; left: 50%; transform: translateX(-50%);
+      background: #111827; color: #fff; padding: 8px 14px; border-radius: 999px;
+      font-size: 13px; z-index: 99; display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <!-- 登录页 -->
+  <div id="loginView" class="card" style="display:none;">
+    <h2 style="margin:0 0 6px;">My Proxy Hub</h2>
+    <p class="muted" style="margin:0 0 14px;">请输入管理员密码进入私人反代面板</p>
+    <input id="loginPwd" type="password" placeholder="管理员密码" />
+    <button class="primary" style="width:100%;margin-top:12px;" onclick="doLogin()">登录</button>
+    <p id="loginErr" class="muted" style="color:var(--red);margin-top:8px;"></p>
+  </div>
+
+  <!-- 主界面 -->
+  <div id="appView" style="display:none;">
+    <header>
+      <div class="brand"><span class="dot"></span>My Proxy Hub</div>
+      <button class="sm" onclick="refreshAll()">刷新</button>
+    </header>
+
+    <main>
+      <!-- 1. 概览 -->
+      <section id="page-dashboard" class="page active">
+        <div class="grid-2">
+          <div class="stat-box">
+            <div class="stat-label">今日请求</div>
+            <div class="stat-val" id="st-today-req">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">总成功率</div>
+            <div class="stat-val" id="st-rate">100%</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">累计 Token</div>
+            <div class="stat-val" id="st-tokens">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">启用渠道</div>
+            <div class="stat-val" id="st-channels">0 / 0</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>酒馆 / Kelivo 接入信息</span>
+            <span class="badge badge-info">OpenAI /v1</span>
+          </div>
+          <div class="muted">接口地址（API Base URL）</div>
+          <div class="row" style="margin:6px 0 12px;">
+            <span class="mono" id="proxyBaseUrl"></span>
+            <button class="sm" onclick="copyText(document.getElementById('proxyBaseUrl').textContent)">复制地址</button>
+          </div>
+          <div class="muted">对外总密钥（API Key）</div>
+          <div class="row" style="margin-top:6px;">
+            <span class="mono" id="proxyApiKey"></span>
+            <button class="sm" onclick="copyText(currentProxyKey)">复制密钥</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">各渠道统计</div>
+          <div id="channelStatsList" class="muted">暂无调用记录</div>
+        </div>
+      </section>
+
+      <!-- 2. 渠道 -->
+      <section id="page-channels" class="page">
+        <div class="row" style="margin-bottom:12px;">
+          <span class="muted">在这里开关、测试或添加反代模块</span>
+          <button class="primary sm" onclick="openChannelModal()">+ 添加渠道</button>
+        </div>
+        <div id="channelsList"></div>
+      </section>
+
+      <!-- 3. 日志 -->
+      <section id="page-logs" class="page">
+        <div class="row" style="margin-bottom:10px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13.5px;">
+            <input id="onlyErrorsChk" type="checkbox" style="width:auto;margin:0;" onchange="loadLogs()" />
+            只看报错
+          </label>
+          <div class="row">
+            <button class="sm" onclick="loadLogs()">刷新日志</button>
+            <button class="sm danger" onclick="clearLogs()">清空</button>
+          </div>
+        </div>
+        <div class="card" id="logsList" style="padding:6px 14px;">
+          <div class="muted" style="padding:10px 0;">暂无日志</div>
+        </div>
+      </section>
+
+      <!-- 4. 设置 -->
+      <section id="page-settings" class="page">
+        <div class="card">
+          <div class="card-title">重置对外总 API Key</div>
+          <p class="muted" style="margin:0 0 10px;">重置后需要同步更新酒馆和 Kelivo 里填的密钥。</p>
+          <button class="danger sm" onclick="rotateProxyKey()">重新生成总密钥</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">修改面板登录密码</div>
+          <input id="oldPwd" type="password" placeholder="当前密码" />
+          <input id="newPwd" type="password" placeholder="新密码（至少 6 位）" />
+          <button class="primary sm" style="margin-top:10px;" onclick="changePassword()">保存新密码</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">已自动加载的反代插件（providers/）</div>
+          <div id="providerList" class="muted"></div>
+        </div>
+
+        <div class="card">
+          <button class="danger" style="width:100%;" onclick="logout()">退出登录</button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active" onclick="switchTab('dashboard', this)"><span class="nav-icon">📊</span>概览</button>
+      <button class="nav-btn" onclick="switchTab('channels', this)"><span class="nav-icon">🔌</span>渠道</button>
+      <button class="nav-btn" onclick="switchTab('logs', this)"><span class="nav-icon">🧾</span>日志</button>
+      <button class="nav-btn" onclick="switchTab('settings', this)"><span class="nav-icon">⚙️</span>设置</button>
+    </nav>
+  </div>
+
+  <!-- 新建 / 编辑渠道弹窗 -->
+  <div id="channelModal" class="modal-mask" onclick="if(event.target===this) closeChannelModal()">
+    <div class="modal">
+      <div class="row" style="margin-bottom:10px;">
+        <strong id="modalTitle" style="font-size:16px;">添加渠道</strong>
+        <button class="sm" onclick="closeChannelModal()">关闭</button>
+      </div>
+      <input type="hidden" id="editChannelId" />
+      <label class="field-label">渠道名称</label>
+      <input id="chName" placeholder="例如：Google 免费池 / 本机 Kiro" />
+
+      <label class="field-label">反代插件类型</label>
+      <select id="chType" onchange="renderDynamicFields()"></select>
+      <div id="chTypeDesc" class="field-help"></div>
+
+      <div id="dynamicFields"></div>
+
+      <label class="field-label">指定模型列表（逗号分隔，留空表示接管全部模型）</label>
+      <input id="chModels" placeholder="例如：gemini-2.5-flash,gemini-2.5-pro（留空则通配）" />
+
+      <label class="field-label">优先级（数字越大越优先）</label>
+      <input id="chPriority" type="number" value="10" />
+
+      <button class="primary" style="width:100%;margin-top:16px;" onclick="saveChannel()">保存渠道</button>
+    </div>
+  </div>
+
+  <script>
+    let token = localStorage.getItem("hub_token") || "";
+    let providers = [];
+    let channelsCache = [];
+    let currentProxyKey = "";
+
+    function toast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 2200);
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast("已复制到剪贴板");
+      } catch {
+        toast("复制失败，请长按手动复制");
+      }
+    }
+
+    async function api(path, opts = {}) {
+      const headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
+      if (token) headers["Authorization"] = "Bearer " + token;
+      const res = await fetch(path, Object.assign({}, opts, { headers }));
+      if (res.status === 401 && path !== "/api/login") {
+        logout();
+        throw new Error("未登录");
+      }
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || ("请求失败 " + res.status));
+      return data;
+    }
+
+    async function doLogin() {
+      const pwd = document.getElementById("loginPwd").value;
+      document.getElementById("loginErr").textContent = "";
+      try {
+        const res = await api("/api/login", { method: "POST", body: JSON.stringify({ password: pwd }) });
+        token = res.token;
+        localStorage.setItem("hub_token", token);
+        showApp();
+      } catch (e) {
+        document.getElementById("loginErr").textContent = e.message;
+      }
+    }
+
+    function logout() {
+      token = "";
+      localStorage.removeItem("hub_token");
+      document.getElementById("appView").style.display = "none";
+      document.getElementById("loginView").style.display = "block";
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.getElementById("page-" + name).classList.add("active");
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      if (name === "logs") loadLogs();
+      if (name === "channels") loadChannels();
+      if (name === "dashboard") loadStats();
+    }
+
+    async function showApp() {
+      document.getElementById("loginView").style.display = "none";
+      document.getElementById("appView").style.display = "block";
+      document.getElementById("proxyBaseUrl").textContent = window.location.origin + "/v1";
+      await refreshAll();
+    }
+
+    async function refreshAll() {
+      await loadProviders();
+      await Promise.all([loadStats(), loadChannels(), loadLogs()]);
+    }
+
+    async function loadProviders() {
+      const data = await api("/api/providers");
+      providers = data.providers || [];
+      const sel = document.getElementById("chType");
+      sel.innerHTML = providers.map(p => `<option value="${p.provider_type}">${p.label}</option>`).join("");
+      document.getElementById("providerList").innerHTML = providers.map(p =>
+        `<div style="padding:6px 0;border-bottom:1px solid var(--border);">
+          <strong>${p.label}</strong> <span class="badge badge-info">${p.provider_type}</span>
+          <div class="field-help">${p.description}</div>
+        </div>`
+      ).join("") || "无已加载插件";
+    }
+
+    async function loadStats() {
+      const s = await api("/api/stats");
+      currentProxyKey = s.proxy_api_key || "";
+      document.getElementById("st-today-req").textContent = s.today_requests;
+      document.getElementById("st-rate").textContent = s.success_rate + "%";
+      document.getElementById("st-tokens").textContent = s.total_tokens.toLocaleString();
+      document.getElementById("st-channels").textContent = `${s.channel_enabled} / ${s.channel_total}`;
+      document.getElementById("proxyApiKey").textContent = currentProxyKey ? (currentProxyKey.slice(0, 12) + "••••••••") : "未设置";
+
+      const list = s.by_channel || [];
+      document.getElementById("channelStatsList").innerHTML = list.length
+        ? list.map(c => {
+            const rate = c.requests ? Math.round((c.successes / c.requests) * 100) : 100;
+            return `<div class="row" style="padding:8px 0;border-bottom:1px solid var(--border);">
+              <div><strong>${c.channel_name}</strong> <span class="muted">(${c.requests} 次)</span></div>
+              <div class="muted">成功 ${rate}% · ${c.tokens} tok · ${c.avg_latency_ms}ms</div>
+            </div>`;
+          }).join("")
+        : "暂无调用记录";
+    }
+
+    async function loadChannels() {
+      const data = await api("/api/channels");
+      channelsCache = data.channels || [];
+      const container = document.getElementById("channelsList");
+      if (!channelsCache.length) {
+        container.innerHTML = `<div class="card muted">还没有配置任何渠道，点右上角「+ 添加渠道」开始吧！</div>`;
+        return;
+      }
+      container.innerHTML = channelsCache.map(ch => {
+        const badge = ch.last_status === "ok"
+          ? `<span class="badge badge-ok">正常 ${ch.last_latency_ms}ms</span>`
+          : ch.last_status === "error"
+            ? `<span class="badge badge-err">异常</span>`
+            : `<span class="badge badge-info">未测速</span>`;
+        const errHtml = ch.last_error ? `<div class="err-box">${escapeHtml(ch.last_error)}</div>` : "";
+        return `<div class="card">
+          <div class="row">
+            <div>
+              <strong>${escapeHtml(ch.name)}</strong>
+              <span class="badge badge-info" style="margin-left:4px;">${ch.provider_type}</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" ${ch.enabled ? "checked" : ""} onchange="toggleChannel(${ch.id}, this.checked)" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="muted" style="margin:6px 0;">
+            模型：${ch.models ? escapeHtml(ch.models) : "全部通配 (*)"} · 优先级 ${ch.priority}
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <div>${badge}</div>
+            <div class="row">
+              <button class="sm" onclick="testChannel(${ch.id}, this)">测速</button>
+              <button class="sm" onclick="openChannelModal(${ch.id})">编辑</button>
+              <button class="sm danger" onclick="deleteChannel(${ch.id})">删除</button>
+            </div>
+          </div>
+          ${errHtml}
+        </div>`;
+      }).join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s || "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    }
+
+    function renderDynamicFields(values = {}) {
+      const ptype = document.getElementById("chType").value;
+      const p = providers.find(x => x.provider_type === ptype);
+      document.getElementById("chTypeDesc").textContent = p ? p.description : "";
+      const box = document.getElementById("dynamicFields");
+      if (!p) { box.innerHTML = ""; return; }
+      box.innerHTML = p.fields.map(f => {
+        const val = values[f.key] || "";
+        const inputEl = f.type === "textarea"
+          ? `<textarea data-cfg-key="${f.key}" placeholder="${escapeHtml(f.placeholder)}">${escapeHtml(val)}</textarea>`
+          : `<input data-cfg-key="${f.key}" type="${f.type === 'password' ? 'password' : 'text'}" value="${escapeHtml(val)}" placeholder="${escapeHtml(f.placeholder)}" />`;
+        return `<label class="field-label">${escapeHtml(f.label)}${f.required ? " *" : ""}</label>
+          ${inputEl}
+          ${f.help ? `<div class="field-help">${escapeHtml(f.help)}</div>` : ""}`;
+      }).join("");
+    }
+
+    function openChannelModal(id = null) {
+      document.getElementById("editChannelId").value = id || "";
+      if (id) {
+        const ch = channelsCache.find(c => c.id === id);
+        document.getElementById("modalTitle").textContent = "编辑渠道";
+        document.getElementById("chName").value = ch.name;
+        document.getElementById("chType").value = ch.provider_type;
+        document.getElementById("chModels").value = ch.models || "";
+        document.getElementById("chPriority").value = ch.priority;
+        renderDynamicFields(ch.config || {});
+      } else {
+        document.getElementById("modalTitle").textContent = "添加渠道";
+        document.getElementById("chName").value = "";
+        document.getElementById("chModels").value = "";
+        document.getElementById("chPriority").value = 10;
+        renderDynamicFields({});
+      }
+      document.getElementById("channelModal").classList.add("show");
+    }
+
+    function closeChannelModal() {
+      document.getElementById("channelModal").classList.remove("show");
+    }
+
+    async function saveChannel() {
+      const id = document.getElementById("editChannelId").value;
+      const config = {};
+      document.querySelectorAll("[data-cfg-key]").forEach(el => {
+        config[el.getAttribute("data-cfg-key")] = el.value.trim();
+      });
+      const payload = {
+        name: document.getElementById("chName").value.trim(),
+        provider_type: document.getElementById("chType").value,
+        models: document.getElementById("chModels").value.trim(),
+        priority: parseInt(document.getElementById("chPriority").value || "10", 10),
+        enabled: true,
+        config,
+      };
+      try {
+        if (id) {
+          await api(`/api/channels/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+          toast("渠道已更新");
+        } else {
+          await api("/api/channels", { method: "POST", body: JSON.stringify(payload) });
+          toast("渠道已添加");
+        }
+        closeChannelModal();
+        await Promise.all([loadChannels(), loadStats()]);
+      } catch (e) {
+        toast(e.message);
+      }
+    }
+
+    async function toggleChannel(id, enabled) {
+      try {
+        await api(`/api/channels/${id}/toggle`, { method: "PATCH", body: JSON.stringify({ enabled }) });
+        toast(enabled ? "已开启渠道" : "已关闭渠道");
+        loadStats();
+      } catch (e) { toast(e.message); }
+    }
+
+    async function testChannel(id, btn) {
+      btn.disabled = true; btn.textContent = "测试中...";
+      try {
+        const res = await api(`/api/channels/${id}/test`, { method: "POST" });
+        toast(res.ok ? `连通成功 (${res.latency_ms}ms)` : "连通失败，请看卡片报错");
+        await loadChannels();
+      } catch (e) {
+        toast(e.message);
+      } finally {
+        btn.disabled = false; btn.textContent = "测速";
+      }
+    }
+
+    async function deleteChannel(id) {
+      if (!confirm("确定删除这个渠道吗？")) return;
+      await api(`/api/channels/${id}`, { method: "DELETE" });
+      toast("已删除");
+      await Promise.all([loadChannels(), loadStats()]);
+    }
+
+    async function loadLogs() {
+      const onlyErr = document.getElementById("onlyErrorsChk").checked;
+      const data = await api(`/api/logs?limit=80&only_errors=${onlyErr}`);
+      const logs = data.logs || [];
+      const box = document.getElementById("logsList");
+      if (!logs.length) {
+        box.innerHTML = `<div class="muted" style="padding:10px 0;">暂无记录</div>`;
+        return;
+      }
+      box.innerHTML = logs.map(l => {
+        const badge = l.success
+          ? `<span class="badge badge-ok">${l.status_code} 成功</span>`
+          : `<span class="badge badge-err">${l.status_code} 报错</span>`;
+        const err = l.error_detail ? `<div class="err-box">${escapeHtml(l.error_detail)}</div>` : "";
+        return `<div class="log-item">
+          <div class="row">
+            <div><strong>${escapeHtml(l.model)}</strong> · <span class="muted">${escapeHtml(l.channel_name)}</span></div>
+            ${badge}
+          </div>
+          <div class="muted" style="margin-top:4px;">
+            ${l.created_at} UTC · ${l.latency_ms}ms · ${l.total_tokens} tok (入 ${l.prompt_tokens} / 出 ${l.completion_tokens})
+          </div>
+          ${err}
+        </div>`;
+      }).join("");
+    }
+
+    async function clearLogs() {
+      if (!confirm("确定清空所有请求日志？")) return;
+      await api("/api/logs", { method: "DELETE" });
+      toast("日志已清空");
+      await Promise.all([loadLogs(), loadStats()]);
+    }
+
+    async function rotateProxyKey() {
+      if (!confirm("确定重新生成对外总密钥？旧密钥会立即失效。")) return;
+      const res = await api("/api/settings/rotate-proxy-key", { method: "POST" });
+      currentProxyKey = res.proxy_api_key;
+      toast("已生成新密钥，请更新酒馆配置");
+      loadStats();
+    }
+
+    async function changePassword() {
+      const old_password = document.getElementById("oldPwd").value;
+      const new_password = document.getElementById("newPwd").value;
+      try {
+        await api("/api/settings/password", { method: "POST", body: JSON.stringify({ old_password, new_password }) });
+        toast("密码已修改，请重新登录");
+        logout();
+      } catch (e) { toast(e.message); }
+    }
+
+    if (token) showApp();
+    else document.getElementById("loginView").style.display = "block";
+  </script>
+</body>
+</html>
