@@ -10,7 +10,7 @@
       --bg: #f6f7f9;
       --surface: #ffffff;
       --surface-soft: #f2f3f5;
-      --surface-hover: #ebedf0;
+      --surface-hover: #e9ebef;
       --border: rgba(17, 24, 39, 0.08);
       --border-strong: rgba(17, 24, 39, 0.14);
       --ink: #111315;
@@ -30,10 +30,7 @@
       --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     html, body {
       margin: 0;
@@ -44,96 +41,42 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    body {
-      padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
-    }
+    body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 
     .icon {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.85;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      width: 18px; height: 18px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.85; stroke-linecap: round; stroke-linejoin: round;
       flex-shrink: 0;
     }
     .icon-sm { width: 15px; height: 15px; }
-    .icon-lg { width: 20px; height: 20px; }
 
-    /* Header */
     header {
-      position: sticky;
-      top: 0;
-      z-index: 20;
+      position: sticky; top: 0; z-index: 20;
       padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
-      background: rgba(246, 247, 249, 0.84);
+      background: rgba(246, 247, 249, 0.86);
       backdrop-filter: blur(20px) saturate(160%);
       -webkit-backdrop-filter: blur(20px) saturate(160%);
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
     }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .brand { display: flex; align-items: center; gap: 10px; }
     .brand-mark {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: var(--ink);
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 13px;
-      letter-spacing: -0.04em;
+      width: 34px; height: 34px; border-radius: 10px;
+      background: var(--ink); color: #ffffff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 13px; letter-spacing: -0.04em;
     }
-    .brand-title {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-    }
-    .brand-sub {
-      font-size: 11.5px;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      margin-top: 2px;
-    }
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--ok);
-    }
+    .brand-title { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+    .brand-sub { font-size: 11.5px; color: var(--muted); display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
 
-    main {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 16px 14px 12px;
-    }
+    main { max-width: 720px; margin: 0 auto; padding: 16px 14px 12px; }
 
-    .page {
-      display: none;
-    }
-    .page.active {
-      display: block;
-      animation: pageEnter 0.24s var(--ease-spring);
-    }
-    @keyframes pageEnter {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .page { display: none; }
+    .page.active { display: block; animation: pageEnter 0.24s var(--ease-spring); }
+    @keyframes pageEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Cards */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -142,481 +85,220 @@
       padding: 16px;
       margin-bottom: 12px;
     }
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .card-title {
-      font-size: 14.5px;
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      color: var(--ink);
-    }
+    .card-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .card-title { font-size: 14.5px; font-weight: 650; letter-spacing: -0.01em; display: flex; align-items: center; gap: 7px; color: var(--ink); }
 
-    /* Stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 12px;
-    }
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
     .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-card);
-      border-radius: var(--radius-lg);
-      padding: 14px 15px;
+      background: var(--surface); border: 1px solid var(--border);
+      box-shadow: var(--shadow-card); border-radius: var(--radius-lg); padding: 14px 15px;
     }
-    .stat-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 500;
-    }
-    .stat-val {
-      font-size: 23px;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      font-variant-numeric: tabular-nums;
-      margin-top: 8px;
-      color: var(--ink);
-    }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 12px; font-weight: 500; }
+    .stat-val { font-size: 23px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; margin-top: 8px; color: var(--ink); }
 
-    /* Helpers */
-    .row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .row-tight {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .row-tight { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .muted { color: var(--muted); font-size: 12.5px; }
     .mono {
       font-family: ui-monospace, "SF Mono", Menlo, monospace;
-      font-size: 12.5px;
-      color: var(--ink-secondary);
-      word-break: break-all;
-      user-select: all;
-      -webkit-user-select: all;
+      font-size: 12.5px; color: var(--ink-secondary);
+      word-break: break-all; user-select: all; -webkit-user-select: all;
     }
 
-    /* Endpoint Box */
     .endpoint-box {
-      background: var(--surface-soft);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 11px 12px;
-      margin-bottom: 10px;
+      background: var(--surface-soft); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 11px 12px; margin-bottom: 10px;
     }
     .endpoint-box:last-child { margin-bottom: 0; }
-    .endpoint-label {
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 5px;
-    }
+    .endpoint-label { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
 
-    /* Badges */
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2.5px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2.5px 8px; border-radius: 999px; font-size: 11px; font-weight: 600;
     }
     .badge-ok { background: var(--ok-soft); color: var(--ok); }
     .badge-pro { background: var(--pro-soft); color: var(--pro); }
     .badge-err { background: var(--danger-soft); color: var(--danger); }
     .badge-neutral { background: var(--surface-soft); color: var(--ink-secondary); }
 
-    /* Buttons with tactile spring feedback */
     button {
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--ink);
-      padding: 8px 13px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      transition: transform 0.16s var(--ease-spring), background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+      border: 1px solid var(--border); background: var(--surface); color: var(--ink);
+      padding: 8px 13px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      transition: transform 0.16s var(--ease-spring), background 0.15s ease, opacity 0.15s ease;
     }
-    button:active {
-      transform: scale(0.95);
-    }
+    button:active { transform: scale(0.95); }
     button:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
-    button.primary {
-      background: var(--ink);
-      color: #ffffff;
-      border-color: var(--ink);
-    }
-    button.ghost {
-      background: var(--surface-soft);
-      border-color: transparent;
-      color: var(--ink-secondary);
-    }
+    button.primary { background: var(--ink); color: #ffffff; border-color: var(--ink); }
+    button.ghost { background: var(--surface-soft); border-color: transparent; color: var(--ink-secondary); }
     button.ghost:active { background: var(--surface-hover); }
-    button.danger {
-      background: var(--danger-soft);
-      border-color: transparent;
-      color: var(--danger);
-    }
-    button.sm {
-      padding: 6px 10px;
-      font-size: 12px;
-      border-radius: 9px;
-    }
-    button.icon-only {
-      width: 34px;
-      height: 34px;
-      padding: 0;
-      border-radius: 10px;
-    }
+    button.danger { background: var(--danger-soft); border-color: transparent; color: var(--danger); }
+    button.sm { padding: 6px 10px; font-size: 12px; border-radius: 9px; }
+    button.icon-only { width: 34px; height: 34px; padding: 0; border-radius: 10px; }
 
-    /* Segmented Control (Replaces ugly checkbox!) */
+    /* Segmented Controls */
     .segmented {
-      position: relative;
-      display: inline-grid;
-      grid-template-columns: 1fr 1fr;
-      background: var(--surface-hover);
-      padding: 3px;
-      border-radius: 11px;
-      min-width: 154px;
+      position: relative; display: inline-grid; grid-template-columns: 1fr 1fr;
+      background: var(--surface-hover); padding: 3px; border-radius: 11px; min-width: 154px;
     }
     .seg-thumb {
-      position: absolute;
-      top: 3px;
-      bottom: 3px;
-      left: 3px;
-      width: calc(50% - 3px);
-      background: var(--surface);
-      border-radius: 8.5px;
+      position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px);
+      background: var(--surface); border-radius: 8.5px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-      transition: transform 0.24s var(--ease-spring);
-      pointer-events: none;
+      transition: transform 0.24s var(--ease-spring); pointer-events: none;
     }
-    .segmented.right .seg-thumb {
-      transform: translateX(100%);
-    }
+    .segmented.right .seg-thumb { transform: translateX(100%); }
     .seg-btn {
-      position: relative;
-      z-index: 1;
-      border: none;
-      background: transparent;
-      color: var(--ink-secondary);
-      padding: 6px 10px;
-      font-size: 12.5px;
-      font-weight: 600;
-      border-radius: 8.5px;
+      position: relative; z-index: 1; border: none; background: transparent;
+      color: var(--ink-secondary); padding: 6px 10px; font-size: 12.5px; font-weight: 600; border-radius: 8.5px;
     }
     .seg-btn:active { transform: none; }
     .seg-btn.active { color: var(--ink); }
 
-    /* Form Controls */
-    input[type="text"],
-    input[type="password"],
-    input[type="number"],
-    input[type="url"],
-    textarea,
-    select {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      background: var(--surface);
-      color: var(--ink);
-      margin-top: 6px;
-      font-family: inherit;
-      outline: none;
+    /* 4-Tab Method Bar inside Add Modal */
+    .method-tabs {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+      background: var(--surface-soft); padding: 4px; border-radius: 12px; margin: 10px 0 14px;
+    }
+    .method-tab {
+      border: none; background: transparent; color: var(--ink-secondary);
+      padding: 7px 4px; font-size: 12px; font-weight: 600; border-radius: 9px;
+    }
+    .method-tab.active {
+      background: var(--surface); color: var(--ink);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .method-pane { display: none; }
+    .method-pane.active { display: block; animation: pageEnter 0.2s var(--ease-spring); }
+
+    /* Step Guide Card (Clean white/gray version of 3-step OAuth flow) */
+    .step-box {
+      background: var(--surface-soft); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 13px 14px; margin-bottom: 12px;
+      font-size: 13px; line-height: 1.65; color: var(--ink-secondary);
+    }
+    .step-row { display: flex; gap: 9px; margin-bottom: 7px; }
+    .step-row:last-child { margin-bottom: 0; }
+    .step-num {
+      width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+      background: var(--ink); color: #fff; font-size: 11px; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .code-display {
+      text-align: center; background: var(--surface); border: 1px dashed var(--border-strong);
+      border-radius: 12px; padding: 14px; margin: 10px 0;
+    }
+    .code-big {
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 24px; font-weight: 800; letter-spacing: 0.14em; color: var(--ink);
+    }
+
+    input[type="text"], input[type="password"], input[type="number"], input[type="url"], textarea, select {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm); font-size: 14px; background: var(--surface);
+      color: var(--ink); margin-top: 6px; font-family: inherit; outline: none;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     input:focus, textarea:focus, select:focus {
-      border-color: var(--ink);
-      box-shadow: 0 0 0 3px rgba(17, 19, 21, 0.08);
+      border-color: var(--ink); box-shadow: 0 0 0 3px rgba(17, 19, 21, 0.08);
     }
-    textarea { min-height: 78px; resize: vertical; }
-    label.field-label {
-      display: block;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--ink-secondary);
-      margin-top: 13px;
-    }
-    .field-help {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 4px;
-      line-height: 1.45;
-    }
+    textarea { min-height: 86px; resize: vertical; }
+    label.field-label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-secondary); margin-top: 12px; }
+    .field-help { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
 
-    /* Accordion / Collapsible Guide */
-    .accordion {
-      margin-top: 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      background: var(--surface-soft);
-      overflow: hidden;
-    }
+    /* Accordion */
+    .accordion { margin-top: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-soft); overflow: hidden; }
     .accordion-head {
-      width: 100%;
-      border: none;
-      background: transparent;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--ink-secondary);
-      border-radius: 0;
+      width: 100%; border: none; background: transparent; padding: 10px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 12.5px; font-weight: 600; color: var(--ink-secondary); border-radius: 0;
     }
     .accordion-head:active { transform: none; background: var(--surface-hover); }
     .accordion-chevron { transition: transform 0.24s var(--ease-spring); }
     .accordion.open .accordion-chevron { transform: rotate(180deg); }
-    .accordion-body {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows 0.25s var(--ease-spring);
-    }
+    .accordion-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.25s var(--ease-spring); }
     .accordion.open .accordion-body { grid-template-rows: 1fr; }
-    .accordion-inner {
-      overflow: hidden;
-      padding: 0 12px;
-      font-size: 12.5px;
-      color: var(--ink-secondary);
-      line-height: 1.6;
-    }
+    .accordion-inner { overflow: hidden; padding: 0 12px; font-size: 12.5px; color: var(--ink-secondary); line-height: 1.6; }
     .accordion.open .accordion-inner { padding: 0 12px 12px; }
 
-    /* iOS Switch */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 26px;
-      flex-shrink: 0;
-    }
+    /* Switch */
+    .switch { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; margin: 0; position: absolute; }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      inset: 0;
-      background: #d1d5db;
-      border-radius: 999px;
-      transition: background 0.22s ease;
-    }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: #d1d5db; border-radius: 999px; transition: background 0.22s ease; }
     .slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 3px;
-      bottom: 3px;
-      background: #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
+      position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px;
+      background: #ffffff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
       transition: transform 0.24s var(--ease-spring);
     }
     input:checked + .slider { background: var(--ink); }
     input:checked + .slider:before { transform: translateX(18px); }
 
-    /* Provider Groups & Quota Bar */
+    /* Groups & Quota */
     .group-block { margin-bottom: 16px; }
-    .group-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 4px 8px;
-    }
-    .group-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--ink-secondary);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .group-head { display: flex; align-items: center; justify-content: space-between; padding: 0 4px 8px; }
+    .group-title { font-size: 13px; font-weight: 700; color: var(--ink-secondary); display: flex; align-items: center; gap: 6px; }
 
-    .quota-wrap {
-      margin-top: 10px;
-      padding-top: 9px;
-      border-top: 1px solid var(--border);
-    }
-    .quota-bar-bg {
-      height: 5px;
-      border-radius: 999px;
-      background: var(--surface-hover);
-      overflow: hidden;
-      margin-top: 6px;
-    }
-    .quota-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: var(--ink);
-      transition: width 0.35s var(--ease-spring);
-    }
+    .quota-wrap { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--border); }
+    .quota-bar-bg { height: 5px; border-radius: 999px; background: var(--surface-hover); overflow: hidden; margin-top: 6px; }
+    .quota-bar-fill { height: 100%; border-radius: 999px; background: var(--ink); transition: width 0.35s var(--ease-spring); }
     .quota-bar-fill.warn { background: var(--pro); }
     .quota-bar-fill.full { background: var(--danger); }
 
-    /* Model Picker Chips */
-    .model-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
-      max-height: 130px;
-      overflow-y: auto;
-      padding: 8px;
-      background: var(--surface-soft);
-      border-radius: var(--radius-sm);
-    }
-    .model-chip {
-      border: 1px solid var(--border-strong);
-      background: var(--surface);
-      color: var(--ink-secondary);
-      padding: 4px 9px;
-      border-radius: 999px;
-      font-size: 11.5px;
-      font-weight: 500;
-    }
-    .model-chip.selected {
-      background: var(--ink);
-      color: #ffffff;
-      border-color: var(--ink);
-    }
+    .model-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 130px; overflow-y: auto; padding: 8px; background: var(--surface-soft); border-radius: var(--radius-sm); }
+    .model-chip { border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink-secondary); padding: 4px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 500; }
+    .model-chip.selected { background: var(--ink); color: #ffffff; border-color: var(--ink); }
 
-    /* Lists & Error Box */
-    .list-row {
-      padding: 11px 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .list-row { padding: 11px 0; border-bottom: 1px solid var(--border); }
     .list-row:first-child { padding-top: 2px; }
     .list-row:last-child { border-bottom: none; padding-bottom: 2px; }
 
     .err-box {
-      margin-top: 8px;
-      padding: 9px 11px;
-      border-radius: 10px;
-      background: var(--danger-soft);
-      border: 1px solid rgba(220, 38, 38, 0.14);
-      color: #991b1b;
-      font-family: ui-monospace, "SF Mono", Menlo, monospace;
-      font-size: 12px;
-      line-height: 1.45;
-      white-space: pre-wrap;
-      word-break: break-all;
+      margin-top: 8px; padding: 9px 11px; border-radius: 10px;
+      background: var(--danger-soft); border: 1px solid rgba(220, 38, 38, 0.14); color: #991b1b;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; line-height: 1.45;
+      white-space: pre-wrap; word-break: break-all;
     }
     .reply-box {
-      margin-top: 8px;
-      padding: 9px 11px;
-      border-radius: 10px;
-      background: var(--ok-soft);
-      border: 1px solid rgba(22, 163, 74, 0.16);
-      color: #166534;
-      font-size: 12.5px;
-      line-height: 1.45;
+      margin-top: 8px; padding: 9px 11px; border-radius: 10px;
+      background: var(--ok-soft); border: 1px solid rgba(22, 163, 74, 0.16); color: #166534;
+      font-size: 12.5px; line-height: 1.45;
     }
 
-    /* Floating Bottom Nav */
+    /* Bottom Nav */
     .nav-wrap {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-      z-index: 30;
-      display: flex;
-      justify-content: center;
-      padding: 0 16px;
-      pointer-events: none;
+      position: fixed; left: 0; right: 0; bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      z-index: 30; display: flex; justify-content: center; padding: 0 16px; pointer-events: none;
     }
     nav.bottom-nav {
-      pointer-events: auto;
-      width: 100%;
-      max-width: 420px;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(22px) saturate(160%);
+      pointer-events: auto; width: 100%; max-width: 420px;
+      background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(22px) saturate(160%);
       -webkit-backdrop-filter: blur(22px) saturate(160%);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-float);
-      border-radius: 24px;
-      padding: 5px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
+      border: 1px solid var(--border); box-shadow: var(--shadow-float);
+      border-radius: 24px; padding: 5px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
     }
     .nav-btn {
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      border-radius: 19px;
-      padding: 8px 4px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      font-size: 11px;
-      font-weight: 600;
+      border: none; background: transparent; color: var(--muted); border-radius: 19px; padding: 8px 4px;
+      display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 600;
       transition: background 0.18s ease, color 0.18s ease, transform 0.15s var(--ease-spring);
     }
     .nav-btn:active { transform: scale(0.92); }
-    .nav-btn.active {
-      background: var(--ink);
-      color: #ffffff;
-    }
+    .nav-btn.active { background: var(--ink); color: #ffffff; }
 
-    /* Animated Modal Sheet */
+    /* Modal Sheet */
     .modal-mask {
-      position: fixed;
-      inset: 0;
-      background: rgba(17, 19, 21, 0.36);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      z-index: 50;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.22s ease;
+      position: fixed; inset: 0; background: rgba(17, 19, 21, 0.36);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      z-index: 50; display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
     }
-    .modal-mask.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .modal-mask.show { opacity: 1; pointer-events: auto; }
     .modal {
-      width: 100%;
-      max-width: 540px;
-      max-height: 88vh;
-      overflow-y: auto;
-      background: var(--surface);
-      border-radius: 24px 24px 0 0;
+      width: 100%; max-width: 540px; max-height: 89vh; overflow-y: auto;
+      background: var(--surface); border-radius: 24px 24px 0 0;
       padding: 18px 18px calc(24px + env(safe-area-inset-bottom, 0px));
       box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
-      transform: translateY(28px);
-      transition: transform 0.28s var(--ease-spring);
+      transform: translateY(28px); transition: transform 0.28s var(--ease-spring);
     }
     .modal-mask.show .modal { transform: translateY(0); }
     @media (min-width: 600px) {
@@ -624,57 +306,22 @@
       .modal { border-radius: 22px; padding: 22px; }
     }
 
-    /* Login */
-    .login-shell {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    #loginView {
-      width: 100%;
-      max-width: 360px;
-      padding: 28px 22px;
-      text-align: center;
-    }
+    .login-shell { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    #loginView { width: 100%; max-width: 360px; padding: 28px 22px; text-align: center; }
     .login-logo {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 14px;
-      border-radius: 14px;
-      background: var(--ink);
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 16px;
-      letter-spacing: -0.04em;
+      width: 48px; height: 48px; margin: 0 auto 14px; border-radius: 14px;
+      background: var(--ink); color: #ffffff; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; letter-spacing: -0.04em;
     }
 
-    /* Toast */
     .toast {
-      position: fixed;
-      top: calc(16px + env(safe-area-inset-top, 0px));
-      left: 50%;
-      transform: translate(-50%, -10px);
-      background: var(--ink);
-      color: #ffffff;
-      padding: 9px 16px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 500;
-      z-index: 99;
-      opacity: 0;
-      pointer-events: none;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+      position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); left: 50%;
+      transform: translate(-50%, -10px); background: var(--ink); color: #ffffff;
+      padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 500;
+      z-index: 99; opacity: 0; pointer-events: none; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
       transition: opacity 0.2s ease, transform 0.24s var(--ease-spring);
     }
-    .toast.show {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .spin { animation: spin 0.7s linear infinite; }
@@ -761,10 +408,7 @@
             <div class="row">
               <span class="mono" id="proxyApiKey"></span>
               <div class="row-tight">
-                <button id="toggleKeyBtn" class="sm ghost" onclick="toggleProxyKeyVisible()" aria-label="显示或隐藏密钥">
-                  <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  显示
-                </button>
+                <button id="toggleKeyBtn" class="sm ghost" onclick="toggleProxyKeyVisible()">显示</button>
                 <button class="sm" onclick="copyWithFeedback(currentProxyKey, this)">
                   <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                   复制
@@ -773,7 +417,7 @@
             </div>
           </div>
 
-          <div class="accordion" id="accFrontendGuide">
+          <div class="accordion">
             <button class="accordion-head" onclick="this.parentElement.classList.toggle('open')">
               <span class="row-tight">
                 <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -783,8 +427,8 @@
             </button>
             <div class="accordion-body">
               <div class="accordion-inner">
-                <div><strong>酒馆（SillyTavern）/ TT 酒馆（TauriTavern）</strong>：连接选「Chat Completion」→ 来源选「自定义（OpenAI 兼容）」→ 填入上面的 Base URL 和总密钥，点连接即可拉取模型。</div>
-                <div style="margin-top:6px;"><strong>小手机（HTML 前端）</strong>：在 API 设置里选 OpenAI 兼容格式，地址填上面带 <span class="mono">/v1</span> 的地址（部分小手机会自动补 /v1，如报错可去掉末尾 /v1 再试），密钥填上面的总密钥。</div>
+                <div><strong>酒馆（SillyTavern）/ TT 酒馆（TauriTavern）</strong>：连接选「Chat Completion」→ 来源选「自定义（OpenAI 兼容）」→ 填入上面的地址和总密钥即可拉取模型。</div>
+                <div style="margin-top:6px;"><strong>小手机（HTML 前端）</strong>：在 API 设置选 OpenAI 兼容格式，填入上面的地址和总密钥即可（部分小手机若自动补 /v1，把末尾 /v1 去掉即可）。</div>
               </div>
             </div>
           </div>
@@ -804,10 +448,10 @@
       <!-- 2. 渠道 -->
       <section id="page-channels" class="page">
         <div class="row" style="margin-bottom:13px;">
-          <span class="muted">按反代类型分组管理所有账号</span>
-          <button class="primary sm" onclick="openChannelModal()">
+          <span class="muted">按反代类型分组 · 支持一键授权与自动识别</span>
+          <button class="primary sm" onclick="openAddModal('oauth')">
             <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            添加账号
+            添加凭证
           </button>
         </div>
         <div id="channelsList"></div>
@@ -929,89 +573,182 @@
     </div>
   </div>
 
-  <!-- 新建 / 编辑账号弹窗 -->
-  <div id="channelModal" class="modal-mask" onclick="if(event.target===this) closeChannelModal()">
+  <!-- 零配置添加凭证弹窗（4 种方式全部内置） -->
+  <div id="addModal" class="modal-mask" onclick="if(event.target===this) closeAddModal()">
+    <div class="modal">
+      <div class="row">
+        <strong style="font-size:16.5px;">添加凭证（自动识别）</strong>
+        <button class="icon-only ghost" onclick="closeAddModal()" aria-label="关闭">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="method-tabs">
+        <button class="method-tab active" data-tab="oauth" onclick="switchMethodTab('oauth', this)">三步授权</button>
+        <button class="method-tab" data-tab="device" onclick="switchMethodTab('device', this)">设备码</button>
+        <button class="method-tab" data-tab="upload" onclick="switchMethodTab('upload', this)">上传凭证</button>
+        <button class="method-tab" data-tab="apikey" onclick="switchMethodTab('apikey', this)">API Key</button>
+      </div>
+
+      <!-- 方式 1：Kiro 三步授权（GitHub / Google） -->
+      <div id="pane-oauth" class="method-pane active">
+        <div class="step-box">
+          <div class="step-row"><span class="step-num">1</span><span>选择 GitHub 或 Google，点击下方按钮前往 Kiro 官方授权。</span></div>
+          <div class="step-row"><span class="step-num">2</span><span>授权后会跳到一个显示<strong>「无法访问」</strong>的页面，直接<strong>完整复制地址栏网址</strong>。</span></div>
+          <div class="step-row"><span class="step-num">3</span><span>粘到下方点提交，后台自动换取凭证并识别 <strong>Free / Pro 与真实额度</strong>。</span></div>
+        </div>
+        <div class="grid-2" style="margin-bottom:10px;">
+          <button class="primary" onclick="startKiroSocial('Github', this)">GitHub 授权登录</button>
+          <button onclick="startKiroSocial('Google', this)">Google 授权登录</button>
+        </div>
+        <div id="socialAuthLinkBox" style="display:none;margin-bottom:10px;" class="endpoint-box">
+          <div class="endpoint-label">已生成官方授权链接</div>
+          <div class="row">
+            <a id="socialAuthHref" href="#" target="_blank" style="font-size:13px;font-weight:600;color:var(--ink);">点击打开官方登录页</a>
+            <button class="sm" onclick="copyWithFeedback(document.getElementById('socialAuthHref').href, this)">复制链接</button>
+          </div>
+        </div>
+        <label class="field-label">粘贴跳转后的完整网址（含 code=...）</label>
+        <textarea id="socialCallbackUrl" placeholder="http://localhost:49153/oauth/callback?code=..."></textarea>
+        <input id="socialName" type="text" placeholder="账号备注名（可留空自动识别）" />
+        <button id="socialSubmitBtn" class="primary" style="width:100%;margin-top:12px;padding:11px;" onclick="completeKiroSocial()">提交并自动识别</button>
+      </div>
+
+      <!-- 方式 2：AWS Builder ID 设备码登录 -->
+      <div id="pane-device" class="method-pane">
+        <div class="step-box">
+          <div class="step-row"><span class="step-num">1</span><span>点下方按钮生成 AWS Builder ID 专属授权码。</span></div>
+          <div class="step-row"><span class="step-num">2</span><span>打开官方页面确认授权，无需复制网址，切回来自动完成绑定并识别额度。</span></div>
+        </div>
+        <input id="deviceName" type="text" placeholder="账号备注名（可留空自动识别）" />
+        <button id="deviceStartBtn" class="primary" style="width:100%;margin-top:10px;padding:11px;" onclick="startKiroDevice()">生成 Builder ID 授权码</button>
+        <div id="deviceCodeBox" style="display:none;margin-top:12px;">
+          <div class="code-display">
+            <div class="muted">验证码</div>
+            <div class="code-big" id="deviceUserCode">----</div>
+            <div style="margin-top:10px;" class="row-tight" style="justify-content:center;">
+              <a id="deviceVerifyUrl" href="#" target="_blank" style="display:inline-block;padding:8px 14px;background:var(--ink);color:#fff;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;">打开 AWS 授权页</a>
+              <button class="sm" onclick="copyWithFeedback(document.getElementById('deviceUserCode').textContent, this)">复制验证码</button>
+            </div>
+            <div id="devicePollStatus" class="muted" style="margin-top:10px;">正在等待你在浏览器点确认...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 方式 3：上传 JSON / 粘贴 Token 自动识别 -->
+      <div id="pane-upload" class="method-pane">
+        <div class="step-box">
+          直接上传 Kiro 导出的 <strong>.json 文件</strong>（支持单号或多号批量），或直接粘贴 <strong>aorAAAAAG...</strong> 凭证，后台自动识别账号、等级与额度。
+        </div>
+        <button class="ghost" style="width:100%;padding:12px;border:1px dashed var(--border-strong);" onclick="document.getElementById('credFileInput').click()">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          选择本地 .json 凭证文件
+        </button>
+        <input id="credFileInput" type="file" accept=".json,application/json,text/plain" style="display:none;" onchange="loadCredFile(this)" />
+        <label class="field-label">或直接粘贴 JSON / RefreshToken</label>
+        <textarea id="uploadRawText" placeholder="粘贴整段 JSON 或 aorAAAAAG..."></textarea>
+        <input id="uploadName" type="text" placeholder="账号备注名（留空自动命名）" />
+        <button id="uploadSubmitBtn" class="primary" style="width:100%;margin-top:12px;padding:11px;" onclick="submitSmartImport('upload')">自动识别并接入</button>
+      </div>
+
+      <!-- 方式 4：官方 API Key / 万能 /v1 接入 -->
+      <div id="pane-apikey" class="method-pane">
+        <div class="step-box">
+          粘贴 <strong>Google AI Studio（AIza...）</strong> 自动识别并拉取 Gemini 模型；若接其他中转站（DeepSeek / NVIDIA NIM 等），填入接口网址和 Key 即可自动拉取模型。
+        </div>
+        <label class="field-label">粘贴 API Key（支持多行轮询）</label>
+        <textarea id="apiKeyRawText" placeholder="例如 AIzaSy...（多把 Key 每行一把）&#10;或 sk-..."></textarea>
+        <label class="field-label">接口地址（Google AIza 密钥请留空，其他中转站填 /v1 地址）</label>
+        <input id="apiKeyBaseUrl" type="url" placeholder="留空 = 自动识别 Google AI Studio；中转站填 https://.../v1" />
+        <div class="grid-2">
+          <div>
+            <label class="field-label">备注名（可选）</label>
+            <input id="apiKeyName" type="text" placeholder="留空自动命名" />
+          </div>
+          <div>
+            <label class="field-label">等级标签（可选）</label>
+            <input id="apiKeyTier" type="text" list="tierOptions" placeholder="Free / Pro" />
+          </div>
+        </div>
+        <button id="apiKeySubmitBtn" class="primary" style="width:100%;margin-top:14px;padding:11px;" onclick="submitSmartImport('apikey')">自动识别并接入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编辑已有账号弹窗（平时隐藏高级设置） -->
+  <div id="editModal" class="modal-mask" onclick="if(event.target===this) closeEditModal()">
     <div class="modal">
       <div class="row" style="margin-bottom:6px;">
-        <strong id="modalTitle" style="font-size:16.5px;">添加账号</strong>
-        <button class="icon-only ghost" onclick="closeChannelModal()" aria-label="关闭">
+        <strong style="font-size:16.5px;">编辑账号</strong>
+        <button class="icon-only ghost" onclick="closeEditModal()" aria-label="关闭">
           <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
       <input type="hidden" id="editChannelId" />
+      <input type="hidden" id="editChannelType" />
 
       <div class="grid-2">
         <div>
           <label class="field-label">账号备注名</label>
-          <input id="chName" placeholder="如：Kiro-主号 / AIS-1号" />
+          <input id="editName" type="text" />
         </div>
         <div>
-          <label class="field-label">等级标签（可选）</label>
-          <input id="chTier" list="tierOptions" placeholder="Free / Pro / 备用" />
-          <datalist id="tierOptions">
-            <option value="Free"></option>
-            <option value="Pro"></option>
-            <option value="Plus"></option>
-            <option value="备用"></option>
-          </datalist>
+          <label class="field-label">等级标签</label>
+          <input id="editTier" type="text" list="tierOptions" placeholder="Free / Pro" />
         </div>
       </div>
+      <datalist id="tierOptions">
+        <option value="Free"></option>
+        <option value="Pro"></option>
+        <option value="Plus"></option>
+        <option value="备用"></option>
+      </datalist>
 
-      <label class="field-label">反代类型</label>
-      <select id="chType" onchange="renderDynamicFields()"></select>
+      <div id="editDynamicFields"></div>
 
-      <div class="accordion" id="accProviderGuide">
+      <div class="row" style="margin-top:13px;">
+        <label class="field-label" style="margin:0;">可用模型（留空 = 通配）</label>
+        <button id="editFetchBtn" type="button" class="sm ghost" onclick="fetchModelsInEdit()">拉取模型</button>
+      </div>
+      <input id="editModels" type="text" />
+      <div id="editFetchedBox" style="display:none;"></div>
+
+      <div class="accordion">
         <button class="accordion-head" type="button" onclick="this.parentElement.classList.toggle('open')">
-          <span class="row-tight">
-            <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            不知道怎么填？点开看说明
-          </span>
+          <span>高级设置（额度上限 / 优先级，一般不用改）</span>
           <svg class="icon icon-sm accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div class="accordion-body">
-          <div class="accordion-inner" id="chTypeGuide"></div>
+          <div class="accordion-inner">
+            <div class="grid-2">
+              <div>
+                <label class="field-label">额度上限（0=不限）</label>
+                <input id="editQuotaLimit" type="number" min="0" value="0" />
+              </div>
+              <div>
+                <label class="field-label">已用次数</label>
+                <input id="editQuotaUsed" type="number" min="0" value="0" />
+              </div>
+            </div>
+            <div class="grid-2">
+              <div>
+                <label class="field-label">重置周期</label>
+                <select id="editQuotaCycle">
+                  <option value="none">不自动重置</option>
+                  <option value="monthly">每月重置</option>
+                  <option value="daily">每日重置</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">优先级（越大越先用）</label>
+                <input id="editPriority" type="number" value="10" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div id="dynamicFields"></div>
-
-      <div class="row" style="margin-top:13px;">
-        <label class="field-label" style="margin:0;">可用模型（留空 = 全部通配）</label>
-        <button id="fetchModelsBtn" type="button" class="sm ghost" onclick="fetchModelsInModal()">
-          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          拉取模型
-        </button>
-      </div>
-      <input id="chModels" placeholder="点击右侧拉取模型，或逗号分隔手填" />
-      <div id="fetchedModelsBox" style="display:none;"></div>
-
-      <div class="grid-2">
-        <div>
-          <label class="field-label">额度上限（0 = 不限）</label>
-          <input id="chQuotaLimit" type="number" min="0" value="0" placeholder="如 Kiro 填 50" />
-        </div>
-        <div>
-          <label class="field-label">额度重置周期</label>
-          <select id="chQuotaCycle">
-            <option value="none">不自动重置</option>
-            <option value="monthly">每月重置</option>
-            <option value="daily">每日重置</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div>
-          <label class="field-label">当前已用次数</label>
-          <input id="chQuotaUsed" type="number" min="0" value="0" />
-        </div>
-        <div>
-          <label class="field-label">优先级（越大越先用）</label>
-          <input id="chPriority" type="number" value="10" />
-        </div>
-      </div>
-
-      <button class="primary" style="width:100%;margin-top:18px;padding:12px;" onclick="saveChannel()">保存账号</button>
+      <button class="primary" style="width:100%;margin-top:16px;padding:12px;" onclick="saveEditedChannel()">保存修改</button>
     </div>
   </div>
 
@@ -1022,13 +759,10 @@
     let currentProxyKey = "";
     let showFullKey = false;
     let onlyErrors = false;
-    let fetchedModelsList = [];
-
-    const GUIDES = {
-      kiro_native: "1. 填入你从 Kiro 提取的 GitHub/Google OAuth RefreshToken（aorAAAAAG... 开头）。<br>2. 区域默认留空即 us-east-1。<br>3. 免费号建议把下方「额度上限」填 50、重置周期选「每月重置」，等级标签填 Free。",
-      gemini_official: "1. 去 Google AI Studio 申请官方免费 AIza... 密钥，每行贴一把可自动轮询。<br>2. 接口地址留空即直连官方。<br>3. 等级标签可按账号填 Free 或 Pro，点击「拉取模型」可自动填入可用 Gemini 模型。",
-      openai_compat: "1. 填入任意兼容 OpenAI /v1 格式的接口地址（如 DeepSeek、NVIDIA NIM 或其他第三方反代）。<br>2. 密钥支持多行填入自动轮询。<br>3. 模型列表留空表示通配全部模型，也可点「拉取模型」精确勾选。"
-    };
+    let socialSessionId = "";
+    let deviceSessionId = "";
+    let devicePollTimer = null;
+    let editFetchedModels = [];
 
     const ICONS = {
       zap: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
@@ -1045,10 +779,9 @@
       el.textContent = msg;
       el.classList.add("show");
       clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => el.classList.remove("show"), 2200);
+      window.__toastTimer = setTimeout(() => el.classList.remove("show"), 2400);
     }
 
-    // 兼容 HTTP 和 iPhone Safari 的可靠复制函数
     async function copyWithFeedback(text, btn) {
       if (!text) { toast("内容为空"); return; }
       let ok = false;
@@ -1139,10 +872,7 @@
         : '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>显示';
     }
 
-    function toggleProxyKeyVisible() {
-      showFullKey = !showFullKey;
-      renderProxyKey();
-    }
+    function toggleProxyKeyVisible() { showFullKey = !showFullKey; renderProxyKey(); }
 
     async function showApp() {
       document.getElementById("loginShell").style.display = "none";
@@ -1166,8 +896,6 @@
     async function loadProviders() {
       const data = await api("/api/providers");
       providers = data.providers || [];
-      const sel = document.getElementById("chType");
-      sel.innerHTML = providers.map(p => `<option value="${p.provider_type}">${escapeHtml(p.label)}</option>`).join("");
       document.getElementById("providerList").innerHTML = providers.map(p =>
         `<div class="list-row">
           <div class="row">
@@ -1208,31 +936,25 @@
       return `<span class="badge ${cls}">${escapeHtml(tier)}</span>`;
     }
 
-    function cycleText(cycle) {
-      if (cycle === "monthly") return "本月";
-      if (cycle === "daily") return "今日";
-      return "累计";
-    }
+    function cycleText(cycle) { return cycle === "monthly" ? "本月" : cycle === "daily" ? "今日" : "累计"; }
 
     async function loadChannels() {
       const data = await api("/api/channels");
       channelsCache = data.channels || [];
       const container = document.getElementById("channelsList");
       if (!channelsCache.length) {
-        container.innerHTML = `<div class="card muted" style="text-align:center;padding:30px 16px;">还没有配置账号，点右上角「添加账号」开始</div>`;
+        container.innerHTML = `<div class="card muted" style="text-align:center;padding:30px 16px;">还没有凭证，点右上角「添加凭证」一键登录或粘贴导入</div>`;
         return;
       }
-
-      // 按 provider_type 分组展示
       const groups = {};
       for (const ch of channelsCache) {
         if (!groups[ch.provider_type]) groups[ch.provider_type] = [];
         groups[ch.provider_type].push(ch);
       }
-
       container.innerHTML = Object.entries(groups).map(([ptype, list]) => {
         const pMeta = providers.find(p => p.provider_type === ptype);
         const gLabel = pMeta ? pMeta.label : ptype;
+        const addTab = ptype === "kiro_native" ? "oauth" : "apikey";
         const cardsHtml = list.map(ch => {
           const statusBadge = ch.last_status === "ok"
             ? `<span class="badge badge-ok">${ICONS.check}${ch.last_latency_ms}ms</span>`
@@ -1240,7 +962,6 @@
               ? `<span class="badge badge-err">${ICONS.alert}异常</span>`
               : `<span class="badge badge-neutral">未测速</span>`;
           const errHtml = ch.last_error ? `<div class="err-box">${escapeHtml(ch.last_error)}</div>` : "";
-
           let quotaHtml = "";
           if (ch.quota_limit > 0) {
             const pct = Math.min(100, Math.round((ch.quota_used / ch.quota_limit) * 100));
@@ -1253,8 +974,7 @@
               <div class="quota-bar-bg"><div class="quota-bar-fill ${fillCls}" style="width:${pct}%"></div></div>
             </div>`;
           }
-
-          return `<div class="card" id="ch-card-${ch.id}">
+          return `<div class="card">
             <div class="row">
               <div class="row-tight">
                 <strong style="font-size:15px;">${escapeHtml(ch.name)}</strong>
@@ -1266,7 +986,7 @@
               </label>
             </div>
             <div class="muted" style="margin:6px 0 4px;">
-              凭证：<span class="mono">${escapeHtml(ch.credential_hint || "-")}</span> · 优先级 ${ch.priority}
+              凭证：<span class="mono">${escapeHtml(ch.credential_hint || "-")}</span>
             </div>
             <div class="muted" style="margin-bottom:10px;">
               模型：${ch.models ? escapeHtml(ch.models) : "全部通配 (*)"}
@@ -1276,7 +996,7 @@
               <div class="row-tight">
                 <button class="sm ghost" onclick="testChannel(${ch.id}, this)">${ICONS.zap}测速</button>
                 <button class="sm ghost" onclick="chatTestChannel(${ch.id}, this)">${ICONS.chat}试聊</button>
-                <button class="sm ghost" onclick="openChannelModal(${ch.id})">${ICONS.edit}编辑</button>
+                <button class="sm ghost" onclick="openEditModal(${ch.id})">${ICONS.edit}编辑</button>
                 <button class="sm danger" onclick="deleteChannel(${ch.id})">${ICONS.trash}</button>
               </div>
             </div>
@@ -1285,159 +1005,231 @@
             ${errHtml}
           </div>`;
         }).join("");
-
         return `<div class="group-block">
           <div class="group-head">
             <div class="group-title">${escapeHtml(gLabel)} <span class="badge badge-neutral">${list.length} 个账号</span></div>
-            <button class="sm ghost" onclick="openChannelModal(null, '${ptype}')">${ICONS.plus}加同款账号</button>
+            <button class="sm ghost" onclick="openAddModal('${addTab}')">${ICONS.plus}加同款账号</button>
           </div>
           ${cardsHtml}
         </div>`;
       }).join("");
     }
 
-    function renderDynamicFields(values = {}) {
-      const ptype = document.getElementById("chType").value;
-      const p = providers.find(x => x.provider_type === ptype);
-      document.getElementById("chTypeGuide").innerHTML = GUIDES[ptype] || (p ? escapeHtml(p.description) : "");
-      const box = document.getElementById("dynamicFields");
-      if (!p) { box.innerHTML = ""; return; }
-      box.innerHTML = p.fields.map(f => {
-        const val = values[f.key] || "";
-        const inputEl = f.type === "textarea"
-          ? `<textarea data-cfg-key="${f.key}" placeholder="${escapeHtml(f.placeholder)}">${escapeHtml(val)}</textarea>`
-          : `<input data-cfg-key="${f.key}" type="${f.type === 'password' ? 'password' : 'text'}" value="${escapeHtml(val)}" placeholder="${escapeHtml(f.placeholder)}" />`;
-        return `<label class="field-label">${escapeHtml(f.label)}${f.required ? " *" : ""}</label>
-          ${inputEl}
-          ${f.help ? `<div class="field-help">${escapeHtml(f.help)}</div>` : ""}`;
-      }).join("");
+    /* ---------- Add Modal (4 Methods) ---------- */
+    function openAddModal(tab = "oauth") {
+      stopDevicePoll();
+      document.getElementById("socialAuthLinkBox").style.display = "none";
+      document.getElementById("deviceCodeBox").style.display = "none";
+      document.getElementById("socialCallbackUrl").value = "";
+      document.getElementById("uploadRawText").value = "";
+      document.getElementById("apiKeyRawText").value = "";
+      document.getElementById("apiKeyBaseUrl").value = "";
+      const btn = document.querySelector(`.method-tab[data-tab="${tab}"]`);
+      if (btn) switchMethodTab(tab, btn);
+      document.getElementById("addModal").classList.add("show");
     }
 
-    function openChannelModal(id = null, presetType = null) {
-      document.getElementById("editChannelId").value = id || "";
-      document.getElementById("fetchedModelsBox").style.display = "none";
-      document.getElementById("accProviderGuide").classList.remove("open");
-      fetchedModelsList = [];
-      if (id) {
-        const ch = channelsCache.find(c => c.id === id);
-        document.getElementById("modalTitle").textContent = "编辑账号";
-        document.getElementById("chName").value = ch.name;
-        document.getElementById("chTier").value = ch.tier || "";
-        document.getElementById("chType").value = ch.provider_type;
-        document.getElementById("chModels").value = ch.models || "";
-        document.getElementById("chPriority").value = ch.priority;
-        document.getElementById("chQuotaLimit").value = ch.quota_limit || 0;
-        document.getElementById("chQuotaUsed").value = ch.quota_used || 0;
-        document.getElementById("chQuotaCycle").value = ch.quota_cycle || "none";
-        renderDynamicFields(ch.config || {});
-      } else {
-        document.getElementById("modalTitle").textContent = "添加账号";
-        document.getElementById("chName").value = "";
-        document.getElementById("chTier").value = "";
-        if (presetType) document.getElementById("chType").value = presetType;
-        document.getElementById("chModels").value = "";
-        document.getElementById("chPriority").value = 10;
-        const t = document.getElementById("chType").value;
-        document.getElementById("chQuotaLimit").value = t === "kiro_native" ? 50 : 0;
-        document.getElementById("chQuotaCycle").value = t === "kiro_native" ? "monthly" : "none";
-        document.getElementById("chQuotaUsed").value = 0;
-        renderDynamicFields({});
-      }
-      document.getElementById("channelModal").classList.add("show");
+    function closeAddModal() {
+      stopDevicePoll();
+      document.getElementById("addModal").classList.remove("show");
     }
 
-    function closeChannelModal() {
-      document.getElementById("channelModal").classList.remove("show");
+    function switchMethodTab(tab, btn) {
+      document.querySelectorAll(".method-tab").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.querySelectorAll(".method-pane").forEach(p => p.classList.remove("active"));
+      document.getElementById("pane-" + tab).classList.add("active");
     }
 
-    function collectConfig() {
-      const config = {};
-      document.querySelectorAll("[data-cfg-key]").forEach(el => {
-        config[el.getAttribute("data-cfg-key")] = el.value.trim();
-      });
-      return config;
-    }
-
-    async function fetchModelsInModal() {
-      const btn = document.getElementById("fetchModelsBtn");
+    async function startKiroSocial(idp, btn) {
       btn.disabled = true;
-      btn.textContent = "拉取中...";
+      try {
+        const res = await api("/api/oauth/kiro/social/start", { method: "POST", body: JSON.stringify({ idp }) });
+        socialSessionId = res.session_id;
+        const a = document.getElementById("socialAuthHref");
+        a.href = res.auth_url;
+        document.getElementById("socialAuthLinkBox").style.display = "block";
+        window.open(res.auth_url, "_blank");
+        toast("已生成链接，请完成登录后复制跳转网址");
+      } catch (e) { toast(e.message); }
+      finally { btn.disabled = false; }
+    }
+
+    async function completeKiroSocial() {
+      const url = document.getElementById("socialCallbackUrl").value.trim();
+      if (!socialSessionId) { toast("请先点击上方按钮生成授权链接"); return; }
+      if (!url) { toast("请粘贴跳转后的完整网址"); return; }
+      const btn = document.getElementById("socialSubmitBtn");
+      btn.disabled = true; btn.textContent = "自动识别并同步额度中...";
+      try {
+        const res = await api("/api/oauth/kiro/social/complete", {
+          method: "POST",
+          body: JSON.stringify({ session_id: socialSessionId, callback_url: url, name: document.getElementById("socialName").value.trim() })
+        });
+        toast(`已接入 ${res.channel.name}（${res.channel.tier || "Free"}）`);
+        closeAddModal();
+        await Promise.all([loadChannels(), loadStats()]);
+      } catch (e) { toast(e.message); }
+      finally { btn.disabled = false; btn.textContent = "提交并自动识别"; }
+    }
+
+    function stopDevicePoll() {
+      if (devicePollTimer) { clearInterval(devicePollTimer); devicePollTimer = null; }
+    }
+
+    async function startKiroDevice() {
+      stopDevicePoll();
+      const btn = document.getElementById("deviceStartBtn");
+      btn.disabled = true; btn.textContent = "生成中...";
+      try {
+        const res = await api("/api/oauth/kiro/device/start", { method: "POST", body: JSON.stringify({}) });
+        deviceSessionId = res.session_id;
+        document.getElementById("deviceUserCode").textContent = res.user_code;
+        document.getElementById("deviceVerifyUrl").href = res.verification_uri;
+        document.getElementById("devicePollStatus").textContent = "等待你在 AWS 页面点确认授权...";
+        document.getElementById("deviceCodeBox").style.display = "block";
+        devicePollTimer = setInterval(pollKiroDevice, Math.max(3, res.interval || 5) * 1000);
+      } catch (e) { toast(e.message); }
+      finally { btn.disabled = false; btn.textContent = "重新生成授权码"; }
+    }
+
+    async function pollKiroDevice() {
+      if (!deviceSessionId) return;
+      try {
+        const res = await api("/api/oauth/kiro/device/poll", {
+          method: "POST",
+          body: JSON.stringify({ session_id: deviceSessionId, name: document.getElementById("deviceName").value.trim() })
+        });
+        if (res.status === "ok") {
+          stopDevicePoll();
+          toast(`授权成功：${res.channel.name}（${res.channel.tier || "Free"}）`);
+          closeAddModal();
+          await Promise.all([loadChannels(), loadStats()]);
+        }
+      } catch (e) {
+        stopDevicePoll();
+        document.getElementById("devicePollStatus").textContent = e.message;
+      }
+    }
+
+    async function loadCredFile(input) {
+      const file = input.files[0];
+      if (!file) return;
+      document.getElementById("uploadRawText").value = await file.text();
+      toast(`已读取 ${file.name}，点下方按钮即可自动导入`);
+      input.value = "";
+    }
+
+    async function submitSmartImport(mode) {
+      const isUpload = mode === "upload";
+      const raw = document.getElementById(isUpload ? "uploadRawText" : "apiKeyRawText").value.trim();
+      const name = document.getElementById(isUpload ? "uploadName" : "apiKeyName").value.trim();
+      const base_url = isUpload ? "" : document.getElementById("apiKeyBaseUrl").value.trim();
+      const tier = isUpload ? "" : document.getElementById("apiKeyTier").value.trim();
+      const btn = document.getElementById(isUpload ? "uploadSubmitBtn" : "apiKeySubmitBtn");
+      if (!raw) { toast("请先粘贴凭证或选择文件"); return; }
+      btn.disabled = true; btn.textContent = "自动识别并测速中...";
+      try {
+        const res = await api("/api/smart-import", { method: "POST", body: JSON.stringify({ raw_text: raw, name, base_url, tier }) });
+        toast(`已自动接入 ${res.channels.length} 个账号`);
+        closeAddModal();
+        await Promise.all([loadChannels(), loadStats()]);
+      } catch (e) { toast(e.message); }
+      finally { btn.disabled = false; btn.textContent = "自动识别并接入"; }
+    }
+
+    /* ---------- Edit Modal ---------- */
+    function openEditModal(id) {
+      const ch = channelsCache.find(c => c.id === id);
+      if (!ch) return;
+      document.getElementById("editChannelId").value = ch.id;
+      document.getElementById("editChannelType").value = ch.provider_type;
+      document.getElementById("editName").value = ch.name;
+      document.getElementById("editTier").value = ch.tier || "";
+      document.getElementById("editModels").value = ch.models || "";
+      document.getElementById("editQuotaLimit").value = ch.quota_limit || 0;
+      document.getElementById("editQuotaUsed").value = ch.quota_used || 0;
+      document.getElementById("editQuotaCycle").value = ch.quota_cycle || "none";
+      document.getElementById("editPriority").value = ch.priority;
+      document.getElementById("editFetchedBox").style.display = "none";
+
+      const p = providers.find(x => x.provider_type === ch.provider_type);
+      const box = document.getElementById("editDynamicFields");
+      box.innerHTML = p ? p.fields.map(f => {
+        const val = (ch.config || {})[f.key] || "";
+        const inputEl = f.type === "textarea"
+          ? `<textarea data-edit-key="${f.key}">${escapeHtml(val)}</textarea>`
+          : `<input data-edit-key="${f.key}" type="${f.type === 'password' ? 'password' : 'text'}" value="${escapeHtml(val)}" />`;
+        return `<label class="field-label">${escapeHtml(f.label)}</label>${inputEl}`;
+      }).join("") : "";
+      document.getElementById("editModal").classList.add("show");
+    }
+
+    function closeEditModal() { document.getElementById("editModal").classList.remove("show"); }
+
+    function collectEditConfig() {
+      const id = parseInt(document.getElementById("editChannelId").value, 10);
+      const ch = channelsCache.find(c => c.id === id);
+      const cfg = Object.assign({}, ch ? ch.config : {});
+      document.querySelectorAll("[data-edit-key]").forEach(el => { cfg[el.getAttribute("data-edit-key")] = el.value.trim(); });
+      return cfg;
+    }
+
+    async function fetchModelsInEdit() {
+      const btn = document.getElementById("editFetchBtn");
+      btn.disabled = true; btn.textContent = "拉取中...";
       try {
         const res = await api("/api/providers/fetch-models", {
           method: "POST",
-          body: JSON.stringify({ provider_type: document.getElementById("chType").value, config: collectConfig() })
+          body: JSON.stringify({ provider_type: document.getElementById("editChannelType").value, config: collectEditConfig() })
         });
-        fetchedModelsList = res.models || [];
-        if (!fetchedModelsList.length) {
-          toast("未拉取到模型，请先检查凭证");
-          return;
-        }
-        renderFetchedModels();
-        toast(`拉取到 ${fetchedModelsList.length} 个模型`);
-      } catch (e) {
-        toast(e.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>拉取模型';
-      }
+        editFetchedModels = res.models || [];
+        renderEditModels();
+        toast(`拉取到 ${editFetchedModels.length} 个模型`);
+      } catch (e) { toast(e.message); }
+      finally { btn.disabled = false; btn.textContent = "拉取模型"; }
     }
 
-    function renderFetchedModels() {
-      const box = document.getElementById("fetchedModelsBox");
-      const current = new Set(document.getElementById("chModels").value.split(",").map(s => s.trim()).filter(Boolean));
+    function renderEditModels() {
+      const box = document.getElementById("editFetchedBox");
+      const current = new Set(document.getElementById("editModels").value.split(",").map(s => s.trim()).filter(Boolean));
       box.style.display = "block";
-      box.innerHTML = `<div class="row" style="margin-top:8px;">
-          <span class="muted">点选要启用的模型</span>
-          <button type="button" class="sm ghost" onclick="selectAllFetchedModels()">全选</button>
-        </div>
-        <div class="model-chips">
-          ${fetchedModelsList.map(m => `<button type="button" class="model-chip ${current.has(m) ? 'selected' : ''}" onclick="toggleModelChip('${escapeHtml(m)}')">${escapeHtml(m)}</button>`).join("")}
-        </div>`;
+      box.innerHTML = `<div class="model-chips">
+        ${editFetchedModels.map(m => `<button type="button" class="model-chip ${current.has(m) ? 'selected' : ''}" onclick="toggleEditModel('${escapeHtml(m)}')">${escapeHtml(m)}</button>`).join("")}
+      </div>`;
     }
 
-    function toggleModelChip(m) {
-      const current = document.getElementById("chModels").value.split(",").map(s => s.trim()).filter(Boolean);
+    function toggleEditModel(m) {
+      const current = document.getElementById("editModels").value.split(",").map(s => s.trim()).filter(Boolean);
       const idx = current.indexOf(m);
-      if (idx >= 0) current.splice(idx, 1);
-      else current.push(m);
-      document.getElementById("chModels").value = current.join(",");
-      renderFetchedModels();
+      if (idx >= 0) current.splice(idx, 1); else current.push(m);
+      document.getElementById("editModels").value = current.join(",");
+      renderEditModels();
     }
 
-    function selectAllFetchedModels() {
-      document.getElementById("chModels").value = fetchedModelsList.join(",");
-      renderFetchedModels();
-    }
-
-    async function saveChannel() {
+    async function saveEditedChannel() {
       const id = document.getElementById("editChannelId").value;
       const payload = {
-        name: document.getElementById("chName").value.trim(),
-        tier: document.getElementById("chTier").value.trim(),
-        provider_type: document.getElementById("chType").value,
-        models: document.getElementById("chModels").value.trim(),
-        priority: parseInt(document.getElementById("chPriority").value || "10", 10),
-        quota_limit: parseInt(document.getElementById("chQuotaLimit").value || "0", 10),
-        quota_used: parseInt(document.getElementById("chQuotaUsed").value || "0", 10),
-        quota_cycle: document.getElementById("chQuotaCycle").value,
+        name: document.getElementById("editName").value.trim(),
+        tier: document.getElementById("editTier").value.trim(),
+        provider_type: document.getElementById("editChannelType").value,
+        models: document.getElementById("editModels").value.trim(),
+        priority: parseInt(document.getElementById("editPriority").value || "10", 10),
+        quota_limit: parseInt(document.getElementById("editQuotaLimit").value || "0", 10),
+        quota_used: parseInt(document.getElementById("editQuotaUsed").value || "0", 10),
+        quota_cycle: document.getElementById("editQuotaCycle").value,
         enabled: true,
-        config: collectConfig(),
+        config: collectEditConfig(),
       };
       try {
-        if (id) {
-          await api(`/api/channels/${id}`, { method: "PUT", body: JSON.stringify(payload) });
-          toast("账号已更新");
-        } else {
-          await api("/api/channels", { method: "POST", body: JSON.stringify(payload) });
-          toast("账号已添加");
-        }
-        closeChannelModal();
+        await api(`/api/channels/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+        toast("已保存修改");
+        closeEditModal();
         await Promise.all([loadChannels(), loadStats()]);
-      } catch (e) {
-        toast(e.message);
-      }
+      } catch (e) { toast(e.message); }
     }
 
+    /* ---------- Actions ---------- */
     async function calibrateQuota(id, used, limit) {
       const val = prompt(`输入当前已用次数（上限 ${limit}）：`, String(used));
       if (val === null) return;
@@ -1457,23 +1249,17 @@
     }
 
     async function testChannel(id, btn) {
-      btn.disabled = true;
-      btn.textContent = "测速中...";
+      btn.disabled = true; btn.textContent = "测速中...";
       try {
         const res = await api(`/api/channels/${id}/test`, { method: "POST" });
-        toast(res.ok ? `连通正常 (${res.latency_ms}ms)` : "连通失败，请看报错");
+        toast(res.ok ? res.message : "连通失败，请看报错");
         await loadChannels();
-      } catch (e) {
-        toast(e.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `${ICONS.zap}测速`;
-      }
+      } catch (e) { toast(e.message); }
+      finally { btn.disabled = false; btn.innerHTML = `${ICONS.zap}测速`; }
     }
 
     async function chatTestChannel(id, btn) {
-      btn.disabled = true;
-      btn.textContent = "试聊中...";
+      btn.disabled = true; btn.textContent = "试聊中...";
       try {
         const res = await api(`/api/channels/${id}/chat-test`, { method: "POST" });
         const box = document.getElementById(`ch-reply-${id}`);
@@ -1484,12 +1270,8 @@
           toast("试聊失败");
           if (box) box.innerHTML = `<div class="err-box">${escapeHtml(res.error)}</div>`;
         }
-      } catch (e) {
-        toast(e.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `${ICONS.chat}试聊`;
-      }
+      } catch (e) { toast(e.message); }
+      finally { btn.disabled = false; btn.innerHTML = `${ICONS.chat}试聊`; }
     }
 
     async function deleteChannel(id) {
@@ -1516,9 +1298,7 @@
         return;
       }
       box.innerHTML = logs.map(l => {
-        const badge = l.success
-          ? `<span class="badge badge-ok">${ICONS.check}${l.status_code}</span>`
-          : `<span class="badge badge-err">${ICONS.alert}${l.status_code}</span>`;
+        const badge = l.success ? `<span class="badge badge-ok">${ICONS.check}${l.status_code}</span>` : `<span class="badge badge-err">${ICONS.alert}${l.status_code}</span>`;
         const err = l.error_detail ? `<div class="err-box">${escapeHtml(l.error_detail)}</div>` : "";
         return `<div class="list-row">
           <div class="row">
@@ -1572,11 +1352,8 @@
         const res = await api("/api/backup/import", { method: "POST", body: JSON.stringify({ channels: parsed.channels || [], replace: false }) });
         toast(`已导入 ${res.imported} 个账号`);
         await refreshAll(false);
-      } catch (e) {
-        toast("导入失败：" + e.message);
-      } finally {
-        input.value = "";
-      }
+      } catch (e) { toast("导入失败：" + e.message); }
+      finally { input.value = ""; }
     }
 
     async function changePassword() {
