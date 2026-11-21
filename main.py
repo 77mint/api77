@@ -1,9 +1,12 @@
 import hashlib
 import hmac
+import json
+import re
 import secrets
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from urllib.parse import parse_qs, urlparse
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,7 +16,7 @@ from pydantic import BaseModel
 import db
 from providers import get_provider, list_provider_schemas, load_providers
 
-app = FastAPI(title="77api", version="2.0.0")
+app = FastAPI(title="77api", version="2.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,6 +27,16 @@ app.add_middleware(
 )
 
 STATIC_DIR = Path(__file__).parent / "static"
+
+# 临时存放正在进行中的 OAuth 会话（15 分钟自动失效）
+_OAUTH_SESSIONS: Dict[str, Dict[str, Any]] = {}
+
+
+def _cleanup_oauth_sessions() -> None:
+    now = time.time()
+    expired = [k for k, v in _OAUTH_SESSIONS.items() if v.get("expires_at", 0) < now]
+    for k in expired:
+        _OAUTH_SESSIONS.pop(k, None)
 
 
 @app.on_event("startup")
@@ -129,6 +142,33 @@ class BackupImportReq(BaseModel):
     replace: bool = False
 
 
+class KiroSocialStartReq(BaseModel):
+    idp: str = "Github"  # Github | Google
+    region: str = "us-east-1"
+
+
+class KiroSocialCompleteReq(BaseModel):
+    session_id: str
+    callback_url: str
+    name: str = ""
+
+
+class KiroDeviceStartReq(BaseModel):
+    region: str = "us-east-1"
+
+
+class KiroDevicePollReq(BaseModel):
+    session_id: str
+    name: str = ""
+
+
+class SmartImportReq(BaseModel):
+    raw_text: str
+    name: str = ""
+    tier: str = ""
+    base_url: str = ""
+
+
 # ---------- Web UI ----------
 @app.get("/")
 def serve_index():
@@ -140,7 +180,7 @@ def health():
     return {"status": "ok", "app": "77api", "providers": len(list_provider_schemas())}
 
 
-# ---------- Admin APIs ----------
+# ---------- Admin Auth & Stats ----------
 @app.post("/api/login")
 def admin_login(req: LoginReq):
     stored_hash = db.get_setting("admin_password_hash", "")
@@ -177,6 +217,237 @@ def api_stats():
     return stats
 
 
+# ---------- OAuth & Zero-Config Smart Import APIs ----------
+async def _create_kiro_channel_auto(config: Dict[str, Any], preferred_name: str = "") -> Dict[str, Any]:
+    """自动验活 Kiro 凭证，识别 Free/Pro 等级、额度与邮箱并入库。"""
+    kiro = get_provider("kiro_native")
+    if not kiro:
+        raise HTTPException(status_code=400, detail="未加载 Kiro 插件（providers/kiro.py）")
+
+    t0 = time.perf_counter()
+    ok, info, err = await kiro.inspect_account(config)
+    latency_ms = int((time.perf_counter() - t0) * 1000)
+    if not ok:
+        raise HTTPException(status_code=400, detail=err)
+
+    if info.get("profile_arn") and not config.get("profile_arn"):
+        config["profile_arn"] = info["profile_arn"]
+
+    email = info.get("email") or ""
+    tier = info.get("tier") or "Free"
+    used = int(info.get("quota_used") or 0)
+    limit = int(info.get("quota_limit") or (50 if tier == "Free" else 0))
+    models = await kiro.list_models(config)
+
+    label_hint = email.split("@")[0] if "@" in email else (config.get("refresh_token", "")[-6:] or "账号")
+    final_name = preferred_name.strip() or f"Kiro-{label_hint}"
+
+    cid = db.create_channel(
+        name=final_name,
+        provider_type="kiro_native",
+        config=config,
+        models=",".join(models),
+        enabled=True,
+        priority=10,
+        tier=tier,
+        quota_limit=limit,
+        quota_used=used,
+        quota_cycle="monthly",
+    )
+    db.update_channel_health(cid, "ok", latency_ms, "")
+    return db.get_channel(cid)
+
+
+@app.post("/api/oauth/kiro/social/start", dependencies=[Depends(require_admin)])
+def api_kiro_social_start(req: KiroSocialStartReq):
+    from providers import kiro as kiro_mod
+
+    _cleanup_oauth_sessions()
+    sess = kiro_mod.build_social_auth_url(req.idp, req.region or "us-east-1")
+    sid = secrets.token_urlsafe(16)
+    sess["expires_at"] = time.time() + 900
+    _OAUTH_SESSIONS[sid] = sess
+    return {"session_id": sid, "auth_url": sess["auth_url"], "idp": sess["idp"]}
+
+
+@app.post("/api/oauth/kiro/social/complete", dependencies=[Depends(require_admin)])
+async def api_kiro_social_complete(req: KiroSocialCompleteReq):
+    from providers import kiro as kiro_mod
+
+    sess = _OAUTH_SESSIONS.get(req.session_id)
+    if not sess:
+        raise HTTPException(status_code=400, detail="授权会话已过期，请重新点击第一步生成链接")
+
+    parsed = urlparse(req.callback_url.strip())
+    qs = parse_qs(parsed.query)
+    code = (qs.get("code") or [""])[0].strip()
+    if not code:
+        raise HTTPException(status_code=400, detail="未在粘贴的网址中找到 code 参数，请确认复制了完整地址栏链接")
+
+    tok_data, err = await kiro_mod.exchange_social_code(code, sess["code_verifier"], sess["region"])
+    if not tok_data:
+        raise HTTPException(status_code=400, detail=err)
+
+    _OAUTH_SESSIONS.pop(req.session_id, None)
+    cfg = {
+        "refresh_token": tok_data.get("refreshToken") or "",
+        "region": sess["region"],
+        "profile_arn": tok_data.get("profileArn") or "",
+        "auth_method": "social",
+    }
+    ch = await _create_kiro_channel_auto(cfg, req.name or f"Kiro-{sess['idp']}")
+    return {"ok": True, "channel": ch}
+
+
+@app.post("/api/oauth/kiro/device/start", dependencies=[Depends(require_admin)])
+async def api_kiro_device_start(req: KiroDeviceStartReq):
+    from providers import kiro as kiro_mod
+
+    _cleanup_oauth_sessions()
+    data, err = await kiro_mod.start_builder_device_auth(req.region or "us-east-1")
+    if not data:
+        raise HTTPException(status_code=400, detail=err)
+    sid = secrets.token_urlsafe(16)
+    data["expires_at"] = time.time() + data.get("expires_in", 600)
+    _OAUTH_SESSIONS[sid] = data
+    return {
+        "session_id": sid,
+        "user_code": data["user_code"],
+        "verification_uri": data["verification_uri"],
+        "interval": data["interval"],
+    }
+
+
+@app.post("/api/oauth/kiro/device/poll", dependencies=[Depends(require_admin)])
+async def api_kiro_device_poll(req: KiroDevicePollReq):
+    from providers import kiro as kiro_mod
+
+    sess = _OAUTH_SESSIONS.get(req.session_id)
+    if not sess:
+        raise HTTPException(status_code=400, detail="设备码会话已过期，请重新生成")
+
+    status, tok_data, msg = await kiro_mod.poll_builder_device_token(
+        sess["client_id"], sess["client_secret"], sess["device_code"], sess["region"]
+    )
+    if status == "pending":
+        return {"status": "pending", "message": msg}
+    if status != "ok" or not tok_data:
+        _OAUTH_SESSIONS.pop(req.session_id, None)
+        raise HTTPException(status_code=400, detail=msg)
+
+    _OAUTH_SESSIONS.pop(req.session_id, None)
+    cfg = {
+        "refresh_token": tok_data.get("refreshToken") or "",
+        "client_id": sess["client_id"],
+        "client_secret": sess["client_secret"],
+        "region": sess["region"],
+        "auth_method": "oidc",
+    }
+    ch = await _create_kiro_channel_auto(cfg, req.name or "Kiro-BuilderID")
+    return {"status": "ok", "channel": ch}
+
+
+@app.post("/api/smart-import", dependencies=[Depends(require_admin)])
+async def api_smart_import(req: SmartImportReq):
+    """零配置万能自动识别导入：支持 Kiro JSON（单/多账号）、aorAAAAAG Token、AIza Key、以及任意 /v1 接口。"""
+    raw = (req.raw_text or "").strip()
+    if not raw:
+        raise HTTPException(status_code=400, detail="请先粘贴凭证内容或上传文件")
+
+    created: List[Dict[str, Any]] = []
+
+    # 1. 尝试解析为 JSON（Kiro KAM 导出 / kiro-auth-token.json / SSO JSON）
+    if raw.startswith("{") or raw.startswith("["):
+        try:
+            parsed = json.loads(raw)
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=f"JSON 格式有误: {exc}")
+
+        items = parsed if isinstance(parsed, list) else (parsed.get("accounts") if isinstance(parsed, dict) and isinstance(parsed.get("accounts"), list) else [parsed])
+        for idx, item in enumerate(items):
+            if not isinstance(item, dict):
+                continue
+            creds = item.get("credentials") if isinstance(item.get("credentials"), dict) else item
+            rt = creds.get("refreshToken") or creds.get("refresh_token") or item.get("refreshToken") or ""
+            if not rt:
+                continue
+            cfg = {
+                "refresh_token": str(rt).strip(),
+                "region": str(creds.get("region") or item.get("region") or "us-east-1").strip(),
+                "profile_arn": str(creds.get("profileArn") or item.get("profileArn") or "").strip(),
+                "client_id": str(creds.get("clientId") or item.get("clientId") or "").strip(),
+                "client_secret": str(creds.get("clientSecret") or item.get("clientSecret") or "").strip(),
+                "auth_method": "oidc" if (creds.get("clientId") or item.get("clientId")) else "social",
+            }
+            email_hint = str(item.get("email") or item.get("label") or item.get("name") or "")
+            name_hint = req.name.strip() or email_hint or (f"Kiro-导入{idx + 1}" if len(items) > 1 else "")
+            ch = await _create_kiro_channel_auto(cfg, name_hint)
+            created.append(ch)
+        if not created:
+            raise HTTPException(status_code=400, detail="JSON 中未找到有效的 refreshToken 字段")
+        return {"ok": True, "detected": "kiro_json", "channels": created}
+
+    # 2. 识别 Google AI Studio 官方 Key（AIza...）
+    aiza_keys = re.findall(r"AIza[0-9A-Za-z_\-]{20,}", raw)
+    if aiza_keys:
+        gem = get_provider("gemini_official")
+        cfg = {"api_keys": "\n".join(dict.fromkeys(aiza_keys))}
+        t0 = time.perf_counter()
+        ok, msg = await gem.test_connection(cfg)
+        latency_ms = int((time.perf_counter() - t0) * 1000)
+        models = await gem.list_models(cfg) if ok else []
+        cid = db.create_channel(
+            name=req.name.strip() or f"Gemini-{aiza_keys[0][-4:]}",
+            provider_type="gemini_official",
+            config=cfg,
+            models=",".join(models),
+            enabled=True,
+            priority=10,
+            tier=req.tier.strip() or "Free",
+        )
+        db.update_channel_health(cid, "ok" if ok else "error", latency_ms, "" if ok else msg)
+        return {"ok": True, "detected": "gemini_official", "channels": [db.get_channel(cid)], "message": msg}
+
+    # 3. 识别 Kiro RefreshToken（aorAAAAAG...）
+    if "aorAAAA" in raw or raw.startswith("aor"):
+        tokens = [line.strip() for line in raw.splitlines() if line.strip()]
+        for tok in tokens:
+            ch = await _create_kiro_channel_auto({"refresh_token": tok, "region": "us-east-1", "auth_method": "social"}, req.name)
+            created.append(ch)
+        return {"ok": True, "detected": "kiro_token", "channels": created}
+
+    # 4. 识别 URL + API Key（万能 OpenAI /v1 兼容）
+    url_match = re.search(r"https?://[^\s'\"<>]+", raw)
+    base_url = (req.base_url or (url_match.group(0) if url_match else "")).strip()
+    if base_url:
+        rest = raw.replace(base_url, "").strip()
+        keys = [k.strip() for k in re.split(r"[\s,]+", rest) if len(k.strip()) >= 8]
+        compat = get_provider("openai_compat")
+        cfg = {"base_url": base_url, "api_keys": "\n".join(keys)}
+        t0 = time.perf_counter()
+        ok, msg = await compat.test_connection(cfg)
+        latency_ms = int((time.perf_counter() - t0) * 1000)
+        models = await compat.list_models(cfg) if ok else []
+        host_name = urlparse(base_url).netloc or "自定义反代"
+        cid = db.create_channel(
+            name=req.name.strip() or host_name,
+            provider_type="openai_compat",
+            config=cfg,
+            models=",".join(models),
+            enabled=True,
+            priority=10,
+            tier=req.tier.strip(),
+        )
+        db.update_channel_health(cid, "ok" if ok else "error", latency_ms, "" if ok else msg)
+        return {"ok": True, "detected": "openai_compat", "channels": [db.get_channel(cid)], "message": msg}
+
+    raise HTTPException(
+        status_code=400,
+        detail="未能自动识别该内容：请粘贴 Kiro JSON、aorAAAAAG... Token、Google AIza... Key，或同时包含接口网址（https://...）与 API Key。",
+    )
+
+
+# ---------- Channels CRUD & Testing ----------
 @app.get("/api/channels", dependencies=[Depends(require_admin)])
 def api_list_channels():
     return {"channels": db.list_channels()}
@@ -260,7 +531,21 @@ async def api_test_channel(channel_id: int):
         raise HTTPException(status_code=400, detail=f"未加载插件: {ch['provider_type']}")
     t0 = time.perf_counter()
     try:
-        ok, msg = await provider.test_connection(ch["config"])
+        # 如果是 Kiro，测速时顺手同步最新等级和额度！
+        if ch["provider_type"] == "kiro_native" and hasattr(provider, "inspect_account"):
+            ok, info, err = await provider.inspect_account(ch["config"])
+            if ok:
+                db.update_channel(
+                    channel_id=channel_id,
+                    tier=info.get("tier") or ch.get("tier") or "Free",
+                    quota_used=int(info.get("quota_used") or 0),
+                    quota_limit=int(info.get("quota_limit") or ch.get("quota_limit") or 50),
+                )
+                msg = f"连通正常（{info.get('tier', 'Free')}，额度 {info.get('quota_used', 0)}/{info.get('quota_limit', 50)}）"
+            else:
+                msg = err
+        else:
+            ok, msg = await provider.test_connection(ch["config"])
     except Exception as exc:
         ok, msg = False, f"测试异常: {exc}"
     latency_ms = int((time.perf_counter() - t0) * 1000)
@@ -373,7 +658,7 @@ def api_backup_export():
         }
         for c in channels
     ]
-    return {"app": "77api", "version": "2.0.0", "channels": exported}
+    return {"app": "77api", "version": "2.1.0", "channels": exported}
 
 
 @app.post("/api/backup/import", dependencies=[Depends(require_admin)])
@@ -467,7 +752,6 @@ async def proxy_chat_completions(request: Request):
                 buffered_err = ""
                 try:
                     async for chunk in stream_iter:
-                        # If provider reported an error before sending real content, allow failover
                         if not yielded_any and usage_info.get("error"):
                             buffered_err = usage_info["error"]
                             break
@@ -492,7 +776,7 @@ async def proxy_chat_completions(request: Request):
                     )
                 if yielded_any or (not auto_failover) or idx == len(attempt_list) - 1:
                     if not yielded_any and buffered_err:
-                        yield f'data: {{"error":{{"message":{repr(buffered_err)}}}}}\n\n'.encode("utf-8")
+                        yield f"data: {json.dumps({'error': {'message': buffered_err}}, ensure_ascii=False)}\n\n".encode("utf-8")
                     return
 
         return StreamingResponse(_failover_stream(), status_code=200, media_type="text/event-stream")
