@@ -1,4 +1,7 @@
+import base64
+import hashlib
 import json
+import secrets
 import struct
 import time
 import uuid
@@ -8,7 +11,6 @@ import httpx
 
 from providers.base import BaseProvider, ProviderField, ProxyResult
 
-# 内存缓存刷新后的短期 AccessToken，避免每次聊天都重复换票
 _TOKEN_CACHE: Dict[str, Dict[str, Any]] = {}
 
 DEFAULT_KIRO_MODELS = [
@@ -18,6 +20,211 @@ DEFAULT_KIRO_MODELS = [
     "claude-haiku-4.5",
     "claude-opus-4.5",
 ]
+
+KIRO_REDIRECT_URI = "http://localhost:49153/oauth/callback"
+KIRO_BUILDER_START_URL = "https://view.awsapps.com/start"
+KIRO_OIDC_SCOPES = [
+    "codewhisperer:completions",
+    "codewhisperer:analysis",
+    "codewhisperer:conversations",
+]
+
+
+def generate_pkce_pair() -> Tuple[str, str]:
+    verifier = secrets.token_urlsafe(48)
+    digest = hashlib.sha256(verifier.encode("ascii")).digest()
+    challenge = base64.urlsafe_b64encode(digest).rstrip(b"=").decode("ascii")
+    return verifier, challenge
+
+
+def build_social_auth_url(idp: str, region: str = "us-east-1") -> Dict[str, str]:
+    """生成 Kiro Social (Github / Google) 三步授权登录链接。"""
+    verifier, challenge = generate_pkce_pair()
+    state = secrets.token_urlsafe(16)
+    norm_idp = "Google" if idp.lower() == "google" else "Github"
+    url = (
+        f"https://prod.{region}.auth.desktop.kiro.dev/login"
+        f"?idp={norm_idp}"
+        f"&redirect_uri={KIRO_REDIRECT_URI}"
+        f"&code_challenge={challenge}"
+        f"&code_challenge_method=S256"
+        f"&state={state}"
+    )
+    return {
+        "auth_url": url,
+        "code_verifier": verifier,
+        "state": state,
+        "region": region,
+        "idp": norm_idp,
+        "redirect_uri": KIRO_REDIRECT_URI,
+    }
+
+
+async def exchange_social_code(
+    code: str, code_verifier: str, region: str = "us-east-1"
+) -> Tuple[Optional[Dict[str, Any]], str]:
+    """用回调地址中的 code 换取 Kiro accessToken / refreshToken。"""
+    url = f"https://prod.{region}.auth.desktop.kiro.dev/oauth/token"
+    headers = {"Content-Type": "application/json", "User-Agent": "KiroIDE-0.8.0"}
+    body = {
+        "code": code,
+        "code_verifier": code_verifier,
+        "redirect_uri": KIRO_REDIRECT_URI,
+    }
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            resp = await client.post(url, headers=headers, json=body)
+    except Exception as exc:
+        return None, f"换取凭证网络异常: {exc}"
+    if resp.status_code != 200:
+        return None, f"换取凭证失败 HTTP {resp.status_code}: {resp.text[:300]}"
+    data = resp.json()
+    if not data.get("refreshToken") and not data.get("accessToken"):
+        return None, f"返回数据缺少令牌: {resp.text[:200]}"
+    return data, ""
+
+
+async def start_builder_device_auth(region: str = "us-east-1") -> Tuple[Optional[Dict[str, Any]], str]:
+    """启动 AWS Builder ID 设备码登录（OAuth Device Flow）。"""
+    oidc_base = f"https://oidc.{region}.amazonaws.com"
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            reg_resp = await client.post(
+                f"{oidc_base}/client/register",
+                json={
+                    "clientName": "Kiro",
+                    "clientType": "public",
+                    "scopes": KIRO_OIDC_SCOPES,
+                },
+            )
+            if reg_resp.status_code != 200:
+                return None, f"注册 OIDC 客户端失败 HTTP {reg_resp.status_code}: {reg_resp.text[:250]}"
+            reg = reg_resp.json()
+            client_id = reg.get("clientId", "")
+            client_secret = reg.get("clientSecret", "")
+
+            dev_resp = await client.post(
+                f"{oidc_base}/device_authorization",
+                json={
+                    "clientId": client_id,
+                    "clientSecret": client_secret,
+                    "startUrl": KIRO_BUILDER_START_URL,
+                },
+            )
+            if dev_resp.status_code != 200:
+                return None, f"申请设备码失败 HTTP {dev_resp.status_code}: {dev_resp.text[:250]}"
+            dev = dev_resp.json()
+            return {
+                "region": region,
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "device_code": dev.get("deviceCode", ""),
+                "user_code": dev.get("userCode", ""),
+                "verification_uri": dev.get("verificationUriComplete") or dev.get("verificationUri", ""),
+                "interval": int(dev.get("interval") or 5),
+                "expires_in": int(dev.get("expiresIn") or 600),
+            }, ""
+    except Exception as exc:
+        return None, f"启动设备码登录异常: {exc}"
+
+
+async def poll_builder_device_token(
+    client_id: str, client_secret: str, device_code: str, region: str = "us-east-1"
+) -> Tuple[str, Optional[Dict[str, Any]], str]:
+    """轮询 AWS Builder ID 设备码授权结果。返回 (status: pending|ok|error, data, msg)。"""
+    url = f"https://oidc.{region}.amazonaws.com/token"
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.post(
+                url,
+                json={
+                    "clientId": client_id,
+                    "clientSecret": client_secret,
+                    "deviceCode": device_code,
+                    "grantType": "urn:ietf:params:oauth:grant-type:device_code",
+                },
+            )
+    except Exception as exc:
+        return "error", None, f"轮询异常: {exc}"
+
+    if resp.status_code == 200:
+        return "ok", resp.json(), ""
+
+    text = resp.text[:300]
+    if "authorization_pending" in text or "slow_down" in text:
+        return "pending", None, "等待你在浏览器点击确认授权..."
+    return "error", None, f"授权失败 HTTP {resp.status_code}: {text}"
+
+
+async def fetch_kiro_account_info(
+    access_token: str, region: str = "us-east-1", profile_arn: str = ""
+) -> Dict[str, Any]:
+    """调用 Kiro GetUsageLimits 接口自动识别 Free/Pro 等级、真实额度与账号邮箱。"""
+    endpoints = [
+        f"https://codewhisperer.{region}.amazonaws.com/",
+        f"https://q.{region}.amazonaws.com/",
+    ]
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/x-amz-json-1.0",
+        "X-Amz-Target": "AmazonCodeWhispererService.GetUsageLimits",
+        "User-Agent": "aws-sdk-js/1.0.0 KiroIDE-0.8.0",
+    }
+    body: Dict[str, Any] = {}
+    if profile_arn:
+        body["profileArn"] = profile_arn
+
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        for ep in endpoints:
+            try:
+                resp = await client.post(ep, headers=headers, json=body)
+                if resp.status_code != 200:
+                    continue
+                data = resp.json()
+                sub = data.get("subscriptionInfo") or {}
+                title = str(sub.get("subscriptionTitle") or sub.get("type") or "")
+                tier = "Pro" if "PRO" in title.upper() else ("Free" if title else "Free")
+
+                used = 0
+                limit = 50 if tier == "Free" else 0
+                breakdowns = data.get("usageBreakdownList") or []
+                if breakdowns and isinstance(breakdowns, list):
+                    b0 = breakdowns[0]
+                    raw_used = b0.get("currentUsageWithPrecision") or b0.get("currentUsage") or 0
+                    raw_limit = b0.get("usageLimitWithPrecision") or b0.get("usageLimit") or 0
+                    try:
+                        used = int(round(float(raw_used)))
+                    except Exception:
+                        used = 0
+                    try:
+                        if float(raw_limit) > 0:
+                            limit = int(round(float(raw_limit)))
+                    except Exception:
+                        pass
+
+                user_info = data.get("userInfo") or {}
+                email = str(user_info.get("email") or user_info.get("userId") or "")
+                return {
+                    "ok": True,
+                    "tier": tier,
+                    "subscription_title": title,
+                    "quota_used": used,
+                    "quota_limit": limit,
+                    "quota_cycle": "monthly",
+                    "email": email,
+                }
+            except Exception:
+                continue
+
+    return {
+        "ok": False,
+        "tier": "Free",
+        "subscription_title": "",
+        "quota_used": 0,
+        "quota_limit": 50,
+        "quota_cycle": "monthly",
+        "email": "",
+    }
 
 
 def _extract_text(content: Any) -> str:
@@ -33,7 +240,6 @@ def _extract_text(content: Any) -> str:
 
 
 def _build_kiro_payload(payload: Dict[str, Any], profile_arn: str = "") -> Dict[str, Any]:
-    """将标准 OpenAI messages 转为 Kiro / CodeWhisperer conversationState 格式。"""
     model_id = str(payload.get("model") or "claude-sonnet-4.5").strip()
     raw_messages = payload.get("messages") or []
 
@@ -81,13 +287,12 @@ def _build_kiro_payload(payload: Dict[str, Any], profile_arn: str = "") -> Dict[
         else:
             history.append({"assistantResponseMessage": {"content": text or ""}})
 
-    current_text = chat_msgs[-1][1] or "continue"
     conv_state: Dict[str, Any] = {
         "conversationId": str(uuid.uuid4()),
         "chatTriggerType": "MANUAL",
         "currentMessage": {
             "userInputMessage": {
-                "content": current_text,
+                "content": chat_msgs[-1][1] or "continue",
                 "modelId": model_id,
                 "origin": "AI_EDITOR",
             }
@@ -103,12 +308,10 @@ def _build_kiro_payload(payload: Dict[str, Any], profile_arn: str = "") -> Dict[
 
 
 def _iter_eventstream_payloads(buf: bytearray) -> List[Dict[str, Any]]:
-    """增量解析 AWS EventStream 二进制帧，提取 JSON 负载。"""
     events: List[Dict[str, Any]] = []
     while len(buf) >= 12:
         total_len, headers_len = struct.unpack(">II", buf[:8])
         if total_len < 16 or total_len > 10 * 1024 * 1024:
-            # 异常帧保护：跳过 1 字节避免死循环
             del buf[:1]
             continue
         if len(buf) < total_len:
@@ -139,8 +342,8 @@ def _extract_delta_text(evt: Dict[str, Any]) -> str:
 
 class KiroProvider(BaseProvider):
     provider_type = "kiro_native"
-    label = "Kiro 原生反代 (RefreshToken)"
-    description = "直接内置在 api77 里的 Kiro 反代模块，填入 GitHub / Google 授权的 RefreshToken（aorAAAAAG...），自动续期免 Cookie。"
+    label = "Kiro 原生反代"
+    description = "支持 GitHub / Google 三步授权、AWS Builder ID 设备码登录及 JSON 导入，自动识别 Free/Pro 等级与额度。"
     fields = [
         ProviderField(
             key="refresh_token",
@@ -148,7 +351,7 @@ class KiroProvider(BaseProvider):
             type="password",
             required=True,
             placeholder="aorAAAAAG...",
-            help="填入你提取的 Kiro OAuth RefreshToken，程序会自动刷新短期 AccessToken。",
+            help="可通过一键授权自动获取，也可直接粘贴。",
         ),
         ProviderField(
             key="region",
@@ -156,15 +359,13 @@ class KiroProvider(BaseProvider):
             type="text",
             required=False,
             placeholder="us-east-1",
-            help="留空默认 us-east-1；如果是欧洲区账号可填 eu-west-1。",
         ),
         ProviderField(
             key="profile_arn",
-            label="Profile ARN（可选，一般留空自动获取）",
+            label="Profile ARN（可选）",
             type="text",
             required=False,
-            placeholder="arn:aws:codewhisperer:us-east-1:...",
-            help="多数 Social 登录账号刷新令牌时会自动返回，留空即可。",
+            placeholder="自动获取，一般留空",
         ),
     ]
 
@@ -174,7 +375,6 @@ class KiroProvider(BaseProvider):
     async def _get_access_token(
         self, config: Dict[str, Any], force_refresh: bool = False
     ) -> Tuple[Optional[str], str, str]:
-        """返回 (access_token, profile_arn, error_msg)。"""
         refresh_token = (config.get("refresh_token") or "").strip()
         if not refresh_token:
             return None, "", "未填写 Kiro RefreshToken"
@@ -187,14 +387,30 @@ class KiroProvider(BaseProvider):
             arn = (config.get("profile_arn") or cached.get("profile_arn") or "").strip()
             return cached["access_token"], arn, ""
 
-        url = f"https://prod.{region}.auth.desktop.kiro.dev/refreshToken"
-        headers = {
-            "Content-Type": "application/json",
-            "User-Agent": "KiroIDE-0.8.0",
-        }
+        auth_method = (config.get("auth_method") or "social").lower()
+        client_id = (config.get("client_id") or "").strip()
+        client_secret = (config.get("client_secret") or "").strip()
+
         try:
             async with httpx.AsyncClient(timeout=20.0) as client:
-                resp = await client.post(url, headers=headers, json={"refreshToken": refresh_token})
+                if (auth_method == "oidc" or (client_id and client_secret)) and client_id and client_secret:
+                    url = f"https://oidc.{region}.amazonaws.com/token"
+                    resp = await client.post(
+                        url,
+                        json={
+                            "clientId": client_id,
+                            "clientSecret": client_secret,
+                            "refreshToken": refresh_token,
+                            "grantType": "refresh_token",
+                        },
+                    )
+                else:
+                    url = f"https://prod.{region}.auth.desktop.kiro.dev/refreshToken"
+                    resp = await client.post(
+                        url,
+                        headers={"Content-Type": "application/json", "User-Agent": "KiroIDE-0.8.0"},
+                        json={"refreshToken": refresh_token},
+                    )
         except Exception as exc:
             return None, "", f"刷新 Token 网络异常: {exc}"
 
@@ -215,6 +431,14 @@ class KiroProvider(BaseProvider):
         }
         return access_token, profile_arn, ""
 
+    async def inspect_account(self, config: Dict[str, Any]) -> Tuple[bool, Dict[str, Any], str]:
+        token, arn, err = await self._get_access_token(config, force_refresh=True)
+        if not token:
+            return False, {}, err
+        info = await fetch_kiro_account_info(token, self._region(config), arn)
+        info["profile_arn"] = arn
+        return True, info, ""
+
     def _chat_endpoints(self, region: str) -> List[str]:
         return [
             f"https://q.{region}.amazonaws.com/generateAssistantResponse",
@@ -234,11 +458,13 @@ class KiroProvider(BaseProvider):
         return list(DEFAULT_KIRO_MODELS)
 
     async def test_connection(self, config: Dict[str, Any]) -> Tuple[bool, str]:
-        token, arn, err = await self._get_access_token(config, force_refresh=True)
-        if not token:
+        ok, info, err = await self.inspect_account(config)
+        if not ok:
             return False, err
-        suffix = f"（已获取 Profile ARN）" if arn else ""
-        return True, f"Kiro RefreshToken 刷新成功，凭证有效{suffix}"
+        tier = info.get("tier") or "Free"
+        used = info.get("quota_used", 0)
+        limit = info.get("quota_limit", 50)
+        return True, f"凭证有效（{tier}，额度 {used}/{limit}）"
 
     async def chat(self, config: Dict[str, Any], payload: Dict[str, Any]) -> ProxyResult:
         access_token, profile_arn, err = await self._get_access_token(config)
