@@ -5,29 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>77api</title>
   <style>
-    /* ========= 77api 纯白黑灰极简主题变量 ========= */
+    /* ========= 77api · 纯白黑灰 + Liquid Glass 液态玻璃 ========= */
     :root {
-      --bg: #f6f7f9;
+      --bg: #f2f2f7;
       --surface: #ffffff;
-      --surface-soft: #f2f3f5;
-      --surface-hover: #e9ebef;
-      --border: rgba(17, 24, 39, 0.08);
-      --border-strong: rgba(17, 24, 39, 0.14);
-      --ink: #111315;
-      --ink-secondary: #4b5563;
-      --muted: #8a939e;
+      --surface-soft: #f2f2f7;
+      --surface-hover: #e5e5ea;
+      --border: rgba(0, 0, 0, 0.06);
+      --ink: #111111;
+      --ink-secondary: #555555;
+      --muted: #8e8e93;
       --ok: #16a34a;
       --ok-soft: #ecfdf5;
       --pro: #b45309;
       --pro-soft: #fffbeb;
       --danger: #dc2626;
       --danger-soft: #fef2f2;
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-sm: 10px;
-      --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 6px 20px rgba(16, 24, 40, 0.035);
-      --shadow-float: 0 10px 30px rgba(16, 24, 40, 0.10), 0 1px 3px rgba(16, 24, 40, 0.06);
-      --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -41,60 +35,76 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+    body {
+      padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+    }
 
     .icon {
-      width: 18px; height: 18px;
+      width: 19px; height: 19px;
       stroke: currentColor; fill: none;
-      stroke-width: 1.85; stroke-linecap: round; stroke-linejoin: round;
+      stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
       flex-shrink: 0;
     }
     .icon-sm { width: 15px; height: 15px; }
 
+    /* Top Header */
     header {
       position: sticky; top: 0; z-index: 20;
-      padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
-      background: rgba(246, 247, 249, 0.86);
-      backdrop-filter: blur(20px) saturate(160%);
-      -webkit-backdrop-filter: blur(20px) saturate(160%);
-      border-bottom: 1px solid var(--border);
+      padding: calc(10px + env(safe-area-inset-top, 0px)) 18px 12px;
+      background: rgba(242, 242, 247, 0.90);
       display: flex; align-items: center; justify-content: space-between;
     }
     .brand { display: flex; align-items: center; gap: 10px; }
     .brand-mark {
-      width: 34px; height: 34px; border-radius: 10px;
-      background: var(--ink); color: #ffffff;
+      width: 32px; height: 32px; border-radius: 10px;
+      background: #111111; color: #ffffff;
       display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 13px; letter-spacing: -0.04em;
+      font-weight: 800; font-size: 12.5px; letter-spacing: -0.04em;
     }
-    .brand-title { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
-    .brand-sub { font-size: 11.5px; color: var(--muted); display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+    .brand-title { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+    .brand-sub { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 5px; margin-top: 1px; }
     .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
 
-    main { max-width: 720px; margin: 0 auto; padding: 16px 14px 12px; }
+    /* Liquid Glass Circular Button (mu-back-sm exact recipe) */
+    .glass-circle {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.14) 55%, rgba(255, 255, 255, 0.26) 100%);
+      -webkit-backdrop-filter: none; backdrop-filter: none;
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.10),
+        inset 0 1.5px 1px rgba(255, 255, 255, 1),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.06);
+      color: #111111; padding: 0; cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .glass-circle:active { transform: scale(0.90); }
+
+    main { max-width: 720px; margin: 0 auto; padding: 6px 16px 14px; }
 
     .page { display: none; }
-    .page.active { display: block; animation: pageEnter 0.24s var(--ease-spring); }
-    @keyframes pageEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .page.active { display: block; animation: pageIn 0.24s var(--ease-ios); }
+    @keyframes pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
+    /* Cards (Pure white, clean soft shadow, no harsh borders) */
     .card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-card);
-      border-radius: var(--radius-lg);
+      border-radius: 20px;
       padding: 16px;
       margin-bottom: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
     }
     .card-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
-    .card-title { font-size: 14.5px; font-weight: 650; letter-spacing: -0.01em; display: flex; align-items: center; gap: 7px; color: var(--ink); }
+    .card-title { font-size: 14.5px; font-weight: 650; display: flex; align-items: center; gap: 7px; color: var(--ink); }
 
     .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
     .stat-card {
-      background: var(--surface); border: 1px solid var(--border);
-      box-shadow: var(--shadow-card); border-radius: var(--radius-lg); padding: 14px 15px;
+      background: var(--surface); border-radius: 18px; padding: 14px 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
     .stat-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 12px; font-weight: 500; }
-    .stat-val { font-size: 23px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; margin-top: 8px; color: var(--ink); }
+    .stat-val { font-size: 24px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; margin-top: 8px; }
 
     .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
     .row-tight { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -106,8 +116,7 @@
     }
 
     .endpoint-box {
-      background: var(--surface-soft); border: 1px solid var(--border);
-      border-radius: var(--radius-md); padding: 11px 12px; margin-bottom: 10px;
+      background: var(--surface-soft); border-radius: 14px; padding: 11px 13px; margin-bottom: 10px;
     }
     .endpoint-box:last-child { margin-bottom: 0; }
     .endpoint-label { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
@@ -122,204 +131,455 @@
     .badge-neutral { background: var(--surface-soft); color: var(--ink-secondary); }
 
     button {
-      border: 1px solid var(--border); background: var(--surface); color: var(--ink);
-      padding: 8px 13px; border-radius: var(--radius-sm);
+      border: none; background: var(--surface); color: var(--ink);
+      padding: 8px 13px; border-radius: 11px;
       font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-      transition: transform 0.16s var(--ease-spring), background 0.15s ease, opacity 0.15s ease;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      transition: transform 0.15s ease, background 0.15s ease, opacity 0.15s ease;
     }
-    button:active { transform: scale(0.95); }
+    button:active { transform: scale(0.94); }
     button:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
-    button.primary { background: var(--ink); color: #ffffff; border-color: var(--ink); }
-    button.ghost { background: var(--surface-soft); border-color: transparent; color: var(--ink-secondary); }
-    button.ghost:active { background: var(--surface-hover); }
-    button.danger { background: var(--danger-soft); border-color: transparent; color: var(--danger); }
+    button.primary { background: #111111; color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); }
+    button.ghost { background: var(--surface-soft); color: var(--ink-secondary); box-shadow: none; }
+    button.danger { background: var(--danger-soft); color: var(--danger); box-shadow: none; }
     button.sm { padding: 6px 10px; font-size: 12px; border-radius: 9px; }
-    button.icon-only { width: 34px; height: 34px; padding: 0; border-radius: 10px; }
 
-    /* Segmented Controls */
+    /* ========= 文件夹网格视图（1:1 拟物文件袋 + 探出白纸 + 右下角品牌图标） ========= */
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px 16px;
+      padding: 8px 4px 16px;
+    }
+    @media (min-width: 560px) {
+      .folder-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .folder-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.18s var(--ease-ios);
+    }
+    .folder-item:active {
+      transform: scale(0.95);
+    }
+    .folder-item:active .folder-paper-mid {
+      transform: translateY(-4px) rotate(8deg);
+    }
+
+    .folder-shell {
+      position: relative;
+      width: 100%;
+      max-width: 164px;
+      aspect-ratio: 1.24 / 1;
+      filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.13));
+    }
+
+    /* 后背板与左上凸耳 */
+    .folder-back {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      background: var(--f-back, #161618);
+    }
+    .folder-tab {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 44%;
+      height: 22%;
+      border-radius: 14px 16px 0 0;
+      background: var(--f-back, #161618);
+    }
+    .folder-back-body {
+      position: absolute;
+      top: 12%;
+      left: 0; right: 0; bottom: 0;
+      border-radius: 0 16px 18px 18px;
+      background: var(--f-back, #161618);
+    }
+
+    /* 夹在中间的三张白纸 */
+    .folder-paper {
+      position: absolute;
+      background: #ffffff;
+      border-radius: 11px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+      padding: 10px 10px 0;
+      transition: transform 0.25s var(--ease-ios);
+    }
+    .folder-paper-left {
+      left: 8%; top: 20%; width: 48%; height: 52%;
+      transform: rotate(-3deg);
+    }
+    .folder-paper-right {
+      right: 8%; top: 24%; width: 44%; height: 48%;
+      transform: rotate(3deg);
+    }
+    .folder-paper-mid {
+      left: 28%; top: 7%; width: 46%; height: 60%;
+      transform: rotate(6deg);
+      z-index: 2;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+    }
+    .paper-line {
+      height: 4px; border-radius: 999px; background: #e5e5ea; margin-bottom: 6px;
+    }
+    .paper-line.short { width: 65%; }
+
+    /* 前口袋（立体渐变 + 顶部高光 + 底部压纹细线 + 右下角品牌图标） */
+    .folder-front {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 58%;
+      z-index: 3;
+      border-radius: 16px 16px 18px 18px;
+      background: linear-gradient(155deg, var(--f-front-hi, #3a3a3e) 0%, var(--f-front, #1e1e21) 52%, var(--f-front-lo, #121214) 100%);
+      box-shadow:
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.34),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.28);
+      overflow: hidden;
+    }
+    .folder-front::after {
+      content: "";
+      position: absolute;
+      left: 12%; right: 12%; bottom: 13px;
+      height: 1.5px;
+      background: rgba(255, 255, 255, 0.10);
+      box-shadow: 0 5px 0 rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+    }
+
+    /* 右下角专属品牌图标徽章 */
+    .folder-brand-icon {
+      position: absolute;
+      right: 11px;
+      bottom: 10px;
+      z-index: 4;
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.36);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45);
+    }
+    .folder-brand-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .folder-label {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 650;
+      color: var(--ink);
+      text-align: center;
+    }
+    .folder-sub {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    /* 二级详情页顶栏（左上角液态玻璃返回按钮） */
+    .subview-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .subview-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .subview-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* ========= 底部全液态玻璃悬浮栏（可滑动 + 中间加号 + 激活图标放大） ========= */
+    .nav-wrap {
+      position: fixed;
+      left: 0; right: 0;
+      bottom: max(16px, env(safe-area-inset-bottom));
+      z-index: 30;
+      display: flex;
+      justify-content: center;
+      padding: 0 16px;
+      pointer-events: none;
+    }
+    nav.liquid-bar {
+      pointer-events: auto;
+      position: relative;
+      width: 100%;
+      max-width: 332px;
+      height: 58px;
+      padding: 5px;
+      border-radius: 999px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      touch-action: none;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.22) 100%);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      box-shadow:
+        0 10px 28px rgba(0, 0, 0, 0.14),
+        0 2px 6px rgba(0, 0, 0, 0.06),
+        inset 0 2px 3px rgba(255, 255, 255, 1),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.07);
+    }
+
+    /* 物理滑动玻璃指示器 */
+    .liquid-indicator {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      width: calc(20% - 2px);
+      height: calc(100% - 10px);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.06);
+      box-shadow:
+        inset 0 1.5px 1.5px rgba(255, 255, 255, 0.82),
+        0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: transform 0.28s var(--ease-ios);
+      pointer-events: none;
+    }
+    .liquid-bar.dragging .liquid-indicator {
+      transition: none;
+    }
+
+    .liquid-tab {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      border-radius: 999px;
+      color: #666666;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 10px;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    .liquid-tab:active { transform: scale(0.92); }
+    .liquid-tab svg {
+      width: 20px;
+      height: 20px;
+      transition: transform 0.26s var(--ease-ios);
+    }
+    .liquid-tab.active {
+      color: #111111;
+      font-weight: 650;
+    }
+    /* 到达该界面时，图标平滑放大 */
+    .liquid-tab.active svg {
+      transform: scale(1.26) translateY(-1px);
+      stroke-width: 2.15;
+    }
+
+    /* 中间加号上传按钮 */
+    .liquid-plus {
+      position: relative;
+      z-index: 3;
+      width: 42px;
+      height: 42px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: #111111;
+      color: #ffffff;
+      border: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+      transition: transform 0.18s var(--ease-ios);
+    }
+    .liquid-plus:active { transform: scale(0.88); }
+    .liquid-plus svg { width: 20px; height: 20px; stroke-width: 2.3; }
+
+    /* Segmented Control */
     .segmented {
       position: relative; display: inline-grid; grid-template-columns: 1fr 1fr;
-      background: var(--surface-hover); padding: 3px; border-radius: 11px; min-width: 154px;
+      background: #e5e5ea; padding: 3px; border-radius: 11px; min-width: 154px;
     }
     .seg-thumb {
       position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px);
-      background: var(--surface); border-radius: 8.5px;
+      background: #ffffff; border-radius: 8.5px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-      transition: transform 0.24s var(--ease-spring); pointer-events: none;
+      transition: transform 0.24s var(--ease-ios); pointer-events: none;
     }
     .segmented.right .seg-thumb { transform: translateX(100%); }
     .seg-btn {
-      position: relative; z-index: 1; border: none; background: transparent;
-      color: var(--ink-secondary); padding: 6px 10px; font-size: 12.5px; font-weight: 600; border-radius: 8.5px;
+      position: relative; z-index: 1; border: none; background: transparent; box-shadow: none;
+      color: #666666; padding: 6px 10px; font-size: 12.5px; font-weight: 600; border-radius: 8.5px;
     }
     .seg-btn:active { transform: none; }
-    .seg-btn.active { color: var(--ink); }
+    .seg-btn.active { color: #111111; }
 
-    /* 4-Tab Method Bar inside Add Modal */
-    .method-tabs {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
-      background: var(--surface-soft); padding: 4px; border-radius: 12px; margin: 10px 0 14px;
+    /* Horizontal Scrollable Platform Pills (mu-pills exact recipe) */
+    .platform-pills {
+      display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 12px; scrollbar-width: none;
     }
-    .method-tab {
-      border: none; background: transparent; color: var(--ink-secondary);
-      padding: 7px 4px; font-size: 12px; font-weight: 600; border-radius: 9px;
+    .platform-pills::-webkit-scrollbar { display: none; }
+    .p-pill {
+      padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 500;
+      background: #f2f2f7; color: #333333; white-space: nowrap; box-shadow: none;
     }
-    .method-tab.active {
-      background: var(--surface); color: var(--ink);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-    }
-    .method-pane { display: none; }
-    .method-pane.active { display: block; animation: pageEnter 0.2s var(--ease-spring); }
+    .p-pill.active { background: #111111; color: #ffffff; font-weight: 600; }
 
-    /* Step Guide Card (Clean white/gray version of 3-step OAuth flow) */
+    .sub-seg {
+      display: flex; background: #f2f2f7; border-radius: 12px; padding: 3px; margin-bottom: 12px;
+    }
+    .sub-seg-btn {
+      flex: 1; padding: 6px 0; font-size: 12.5px; color: #666666;
+      background: transparent; border-radius: 9px; box-shadow: none;
+    }
+    .sub-seg-btn.active {
+      background: #ffffff; color: #111111; font-weight: 600;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Inputs (mu-input-card clean borderless style) */
+    input[type="text"], input[type="password"], input[type="number"], input[type="url"], textarea, select {
+      width: 100%; padding: 11px 14px; border: none;
+      border-radius: 14px; font-size: 14px; background: #f2f2f7;
+      color: #111111; margin-top: 6px; font-family: inherit; outline: none;
+      transition: box-shadow 0.15s ease;
+    }
+    input:focus, textarea:focus, select:focus {
+      box-shadow: 0 0 0 2px #111111;
+    }
+    textarea { min-height: 82px; resize: vertical; }
+    label.field-label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-secondary); margin-top: 12px; }
+
     .step-box {
-      background: var(--surface-soft); border: 1px solid var(--border);
-      border-radius: var(--radius-md); padding: 13px 14px; margin-bottom: 12px;
-      font-size: 13px; line-height: 1.65; color: var(--ink-secondary);
+      background: #f2f2f7; border-radius: 16px; padding: 13px 14px; margin-bottom: 12px;
+      font-size: 12.5px; line-height: 1.65; color: var(--ink-secondary);
     }
     .step-row { display: flex; gap: 9px; margin-bottom: 7px; }
     .step-row:last-child { margin-bottom: 0; }
     .step-num {
-      width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
-      background: var(--ink); color: #fff; font-size: 11px; font-weight: 700;
+      width: 19px; height: 19px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+      background: #111111; color: #ffffff; font-size: 11px; font-weight: 700;
       display: inline-flex; align-items: center; justify-content: center;
     }
     .code-display {
-      text-align: center; background: var(--surface); border: 1px dashed var(--border-strong);
-      border-radius: 12px; padding: 14px; margin: 10px 0;
+      text-align: center; background: #f2f2f7; border-radius: 16px; padding: 14px; margin: 10px 0;
     }
     .code-big {
       font-family: ui-monospace, "SF Mono", Menlo, monospace;
-      font-size: 24px; font-weight: 800; letter-spacing: 0.14em; color: var(--ink);
+      font-size: 24px; font-weight: 800; letter-spacing: 0.14em; color: #111111;
     }
-
-    input[type="text"], input[type="password"], input[type="number"], input[type="url"], textarea, select {
-      width: 100%; padding: 10px 12px; border: 1px solid var(--border-strong);
-      border-radius: var(--radius-sm); font-size: 14px; background: var(--surface);
-      color: var(--ink); margin-top: 6px; font-family: inherit; outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-    input:focus, textarea:focus, select:focus {
-      border-color: var(--ink); box-shadow: 0 0 0 3px rgba(17, 19, 21, 0.08);
-    }
-    textarea { min-height: 86px; resize: vertical; }
-    label.field-label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-secondary); margin-top: 12px; }
-    .field-help { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
 
     /* Accordion */
-    .accordion { margin-top: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-soft); overflow: hidden; }
+    .accordion { margin-top: 12px; border-radius: 14px; background: #f2f2f7; overflow: hidden; }
     .accordion-head {
-      width: 100%; border: none; background: transparent; padding: 10px 12px;
+      width: 100%; background: transparent; box-shadow: none; padding: 11px 13px;
       display: flex; align-items: center; justify-content: space-between;
       font-size: 12.5px; font-weight: 600; color: var(--ink-secondary); border-radius: 0;
     }
-    .accordion-head:active { transform: none; background: var(--surface-hover); }
-    .accordion-chevron { transition: transform 0.24s var(--ease-spring); }
+    .accordion-head:active { transform: none; }
+    .accordion-chevron { transition: transform 0.24s var(--ease-ios); }
     .accordion.open .accordion-chevron { transform: rotate(180deg); }
-    .accordion-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.25s var(--ease-spring); }
+    .accordion-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.25s var(--ease-ios); }
     .accordion.open .accordion-body { grid-template-rows: 1fr; }
-    .accordion-inner { overflow: hidden; padding: 0 12px; font-size: 12.5px; color: var(--ink-secondary); line-height: 1.6; }
-    .accordion.open .accordion-inner { padding: 0 12px 12px; }
+    .accordion-inner { overflow: hidden; padding: 0 13px; font-size: 12.5px; color: var(--ink-secondary); line-height: 1.6; }
+    .accordion.open .accordion-inner { padding: 0 13px 12px; }
 
     /* Switch */
     .switch { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; margin: 0; position: absolute; }
-    .slider { position: absolute; cursor: pointer; inset: 0; background: #d1d5db; border-radius: 999px; transition: background 0.22s ease; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: #d1d1d6; border-radius: 999px; transition: background 0.22s ease; }
     .slider:before {
       position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px;
       background: #ffffff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
-      transition: transform 0.24s var(--ease-spring);
+      transition: transform 0.24s var(--ease-ios);
     }
-    input:checked + .slider { background: var(--ink); }
+    input:checked + .slider { background: #111111; }
     input:checked + .slider:before { transform: translateX(18px); }
 
-    /* Groups & Quota */
-    .group-block { margin-bottom: 16px; }
-    .group-head { display: flex; align-items: center; justify-content: space-between; padding: 0 4px 8px; }
-    .group-title { font-size: 13px; font-weight: 700; color: var(--ink-secondary); display: flex; align-items: center; gap: 6px; }
-
-    .quota-wrap { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--border); }
-    .quota-bar-bg { height: 5px; border-radius: 999px; background: var(--surface-hover); overflow: hidden; margin-top: 6px; }
-    .quota-bar-fill { height: 100%; border-radius: 999px; background: var(--ink); transition: width 0.35s var(--ease-spring); }
+    /* Quota Bar */
+    .quota-wrap { margin-top: 10px; padding-top: 9px; border-top: 0.5px solid var(--border); }
+    .quota-bar-bg { height: 5px; border-radius: 999px; background: #e5e5ea; overflow: hidden; margin-top: 6px; }
+    .quota-bar-fill { height: 100%; border-radius: 999px; background: #111111; transition: width 0.35s var(--ease-ios); }
     .quota-bar-fill.warn { background: var(--pro); }
     .quota-bar-fill.full { background: var(--danger); }
 
-    .model-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 130px; overflow-y: auto; padding: 8px; background: var(--surface-soft); border-radius: var(--radius-sm); }
-    .model-chip { border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink-secondary); padding: 4px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 500; }
-    .model-chip.selected { background: var(--ink); color: #ffffff; border-color: var(--ink); }
-
-    .list-row { padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .list-row { padding: 11px 0; border-bottom: 0.5px solid var(--border); }
     .list-row:first-child { padding-top: 2px; }
     .list-row:last-child { border-bottom: none; padding-bottom: 2px; }
 
     .err-box {
-      margin-top: 8px; padding: 9px 11px; border-radius: 10px;
-      background: var(--danger-soft); border: 1px solid rgba(220, 38, 38, 0.14); color: #991b1b;
+      margin-top: 8px; padding: 9px 11px; border-radius: 12px;
+      background: var(--danger-soft); color: #991b1b;
       font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; line-height: 1.45;
       white-space: pre-wrap; word-break: break-all;
     }
     .reply-box {
-      margin-top: 8px; padding: 9px 11px; border-radius: 10px;
-      background: var(--ok-soft); border: 1px solid rgba(22, 163, 74, 0.16); color: #166534;
-      font-size: 12.5px; line-height: 1.45;
+      margin-top: 8px; padding: 9px 11px; border-radius: 12px;
+      background: var(--ok-soft); color: #166534; font-size: 12.5px; line-height: 1.45;
     }
 
-    /* Bottom Nav */
-    .nav-wrap {
-      position: fixed; left: 0; right: 0; bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-      z-index: 30; display: flex; justify-content: center; padding: 0 16px; pointer-events: none;
-    }
-    nav.bottom-nav {
-      pointer-events: auto; width: 100%; max-width: 420px;
-      background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(22px) saturate(160%);
-      -webkit-backdrop-filter: blur(22px) saturate(160%);
-      border: 1px solid var(--border); box-shadow: var(--shadow-float);
-      border-radius: 24px; padding: 5px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
-    }
-    .nav-btn {
-      border: none; background: transparent; color: var(--muted); border-radius: 19px; padding: 8px 4px;
-      display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 600;
-      transition: background 0.18s ease, color 0.18s ease, transform 0.15s var(--ease-spring);
-    }
-    .nav-btn:active { transform: scale(0.92); }
-    .nav-btn.active { background: var(--ink); color: #ffffff; }
-
-    /* Modal Sheet */
+    /* Centered / Sheet Modal (mu-dialog exact feel) */
     .modal-mask {
-      position: fixed; inset: 0; background: rgba(17, 19, 21, 0.36);
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35);
       z-index: 50; display: flex; align-items: flex-end; justify-content: center;
       opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
     }
     .modal-mask.show { opacity: 1; pointer-events: auto; }
     .modal {
-      width: 100%; max-width: 540px; max-height: 89vh; overflow-y: auto;
-      background: var(--surface); border-radius: 24px 24px 0 0;
-      padding: 18px 18px calc(24px + env(safe-area-inset-bottom, 0px));
-      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
-      transform: translateY(28px); transition: transform 0.28s var(--ease-spring);
+      width: 100%; max-width: 520px; max-height: 88vh; overflow-y: auto;
+      background: #ffffff; border-radius: 28px 28px 0 0;
+      padding: 20px 18px calc(24px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.16);
+      transform: translateY(32px); transition: transform 0.28s var(--ease-ios);
     }
     .modal-mask.show .modal { transform: translateY(0); }
     @media (min-width: 600px) {
       .modal-mask { align-items: center; padding: 16px; }
-      .modal { border-radius: 22px; padding: 22px; }
+      .modal { border-radius: 26px; padding: 22px; }
+    }
+
+    .dialog-close {
+      width: 28px; height: 28px; border-radius: 50%; background: #f2f2f7;
+      color: #666666; padding: 0; box-shadow: none;
     }
 
     .login-shell { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    #loginView { width: 100%; max-width: 360px; padding: 28px 22px; text-align: center; }
+    #loginView { width: 100%; max-width: 344px; padding: 26px 22px; border-radius: 26px; text-align: center; }
     .login-logo {
       width: 48px; height: 48px; margin: 0 auto 14px; border-radius: 14px;
-      background: var(--ink); color: #ffffff; display: flex; align-items: center; justify-content: center;
+      background: #111111; color: #ffffff; display: flex; align-items: center; justify-content: center;
       font-weight: 800; font-size: 16px; letter-spacing: -0.04em;
     }
 
     .toast {
       position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); left: 50%;
-      transform: translate(-50%, -10px); background: var(--ink); color: #ffffff;
+      transform: translate(-50%, -10px); background: #111111; color: #ffffff;
       padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 500;
-      z-index: 99; opacity: 0; pointer-events: none; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
-      transition: opacity 0.2s ease, transform 0.24s var(--ease-spring);
+      z-index: 99; opacity: 0; pointer-events: none; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+      transition: opacity 0.2s ease, transform 0.24s var(--ease-ios);
     }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
@@ -338,10 +598,7 @@
       <h2 style="margin:0 0 6px;font-size:20px;letter-spacing:-0.02em;">77api</h2>
       <p class="muted" style="margin:0 0 18px;">输入管理员密码进入控制台</p>
       <input id="loginPwd" type="password" placeholder="管理员密码" onkeydown="if(event.key==='Enter') doLogin()" />
-      <button class="primary" style="width:100%;margin-top:14px;padding:11px;" onclick="doLogin()">
-        <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        登录
-      </button>
+      <button class="primary" style="width:100%;margin-top:14px;padding:12px;border-radius:14px;" onclick="doLogin()">登录</button>
       <p id="loginErr" class="muted" style="color:var(--danger);margin:10px 0 0;"></p>
     </div>
   </div>
@@ -356,8 +613,8 @@
           <div class="brand-sub"><span class="status-dot"></span>常驻运行中</div>
         </div>
       </div>
-      <button id="refreshBtn" class="icon-only ghost" onclick="refreshAll(true)" aria-label="刷新">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+      <button id="refreshBtn" class="glass-circle" onclick="refreshAll(true)" aria-label="刷新">
+        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
       </button>
     </header>
 
@@ -385,76 +642,70 @@
 
         <div class="card">
           <div class="card-header">
-            <div class="card-title">
-              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              通用接口配置
-            </div>
+            <div class="card-title">通用接口配置</div>
             <span class="badge badge-neutral">OpenAI /v1</span>
           </div>
-
           <div class="endpoint-box">
             <div class="endpoint-label">API 地址（Base URL）</div>
             <div class="row">
               <span class="mono" id="proxyBaseUrl"></span>
-              <button class="sm" onclick="copyWithFeedback(document.getElementById('proxyBaseUrl').textContent, this)">
-                <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                复制
-              </button>
+              <button class="sm" onclick="copyWithFeedback(document.getElementById('proxyBaseUrl').textContent, this)">复制</button>
             </div>
           </div>
-
           <div class="endpoint-box">
             <div class="endpoint-label">对外总密钥（API Key）</div>
             <div class="row">
               <span class="mono" id="proxyApiKey"></span>
               <div class="row-tight">
                 <button id="toggleKeyBtn" class="sm ghost" onclick="toggleProxyKeyVisible()">显示</button>
-                <button class="sm" onclick="copyWithFeedback(currentProxyKey, this)">
-                  <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  复制
-                </button>
+                <button class="sm" onclick="copyWithFeedback(currentProxyKey, this)">复制</button>
               </div>
             </div>
           </div>
-
           <div class="accordion">
             <button class="accordion-head" onclick="this.parentElement.classList.toggle('open')">
-              <span class="row-tight">
-                <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                酒馆 / TT 酒馆 / 小手机怎么填？
-              </span>
+              <span>酒馆 / TT 酒馆 / 小手机怎么填？</span>
               <svg class="icon icon-sm accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <div class="accordion-body">
               <div class="accordion-inner">
-                <div><strong>酒馆（SillyTavern）/ TT 酒馆（TauriTavern）</strong>：连接选「Chat Completion」→ 来源选「自定义（OpenAI 兼容）」→ 填入上面的地址和总密钥即可拉取模型。</div>
-                <div style="margin-top:6px;"><strong>小手机（HTML 前端）</strong>：在 API 设置选 OpenAI 兼容格式，填入上面的地址和总密钥即可（部分小手机若自动补 /v1，把末尾 /v1 去掉即可）。</div>
+                <div><strong>酒馆 / TT 酒馆</strong>：连接选「Chat Completion」→ 来源选「自定义（OpenAI 兼容）」→ 填入上面的地址和总密钥即可。</div>
+                <div style="margin-top:6px;"><strong>小手机</strong>：API 设置选 OpenAI 兼容格式，填入上面的地址和总密钥即可（部分小手机自动补 /v1，如报错去掉末尾 /v1）。</div>
               </div>
             </div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">
-              <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-              各账号调用统计
-            </div>
-          </div>
+          <div class="card-header"><div class="card-title">各账号调用统计</div></div>
           <div id="channelStatsList" class="muted">暂无调用记录</div>
         </div>
       </section>
 
-      <!-- 2. 渠道 -->
+      <!-- 2. 渠道（文件夹网格 + 点击进入二级账号详情页） -->
       <section id="page-channels" class="page">
-        <div class="row" style="margin-bottom:13px;">
-          <span class="muted">按反代类型分组 · 支持一键授权与自动识别</span>
-          <button class="primary sm" onclick="openAddModal('oauth')">
-            <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            添加凭证
-          </button>
+        <!-- 文件夹网格视图 -->
+        <div id="folderGridView">
+          <div class="row" style="margin-bottom:10px;padding:0 4px;">
+            <span style="font-size:17px;font-weight:700;">反代文件夹</span>
+            <span class="muted">点底部 + 添加新凭证</span>
+          </div>
+          <div id="folderGrid" class="folder-grid"></div>
         </div>
-        <div id="channelsList"></div>
+
+        <!-- 文件夹详情视图（左上角液态玻璃返回按钮） -->
+        <div id="folderDetailView" style="display:none;">
+          <div class="subview-bar">
+            <div class="subview-left">
+              <button class="glass-circle" onclick="closeFolderDetail()" aria-label="返回">
+                <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <span class="subview-title" id="folderDetailTitle">渠道详情</span>
+            </div>
+            <button class="primary sm" onclick="openAddModal(activeFolderType)">添加同款</button>
+          </div>
+          <div id="folderAccountsList"></div>
+        </div>
       </section>
 
       <!-- 3. 日志 -->
@@ -466,14 +717,8 @@
             <button id="segErr" class="seg-btn" onclick="setLogFilter(true)">仅报错</button>
           </div>
           <div class="row-tight">
-            <button class="sm ghost" onclick="loadLogs()">
-              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
-              刷新
-            </button>
-            <button class="sm danger" onclick="clearLogs()">
-              <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-              清空
-            </button>
+            <button class="sm" onclick="loadLogs()">刷新</button>
+            <button class="sm danger" onclick="clearLogs()">清空</button>
           </div>
         </div>
         <div class="card" id="logsList" style="padding:10px 16px;">
@@ -487,7 +732,7 @@
           <div class="row">
             <div>
               <div class="card-title">故障自动切换备用账号</div>
-              <div class="muted" style="margin-top:3px;">开启后，某账号报错或限速时自动切同组下一个账号（含流式）</div>
+              <div class="muted" style="margin-top:3px;">开启后，账号报错或限速时自动切同组下一个账号（含流式）</div>
             </div>
             <label class="switch">
               <input id="failoverSwitch" type="checkbox" onchange="toggleFailover(this.checked)" />
@@ -497,23 +742,13 @@
         </div>
 
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">
-              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-              重置对外总密钥
-            </div>
-          </div>
-          <p class="muted" style="margin:0 0 12px;">重置后旧密钥会立即失效，需要同步更新前端里的 API Key。</p>
+          <div class="card-header"><div class="card-title">重置对外总密钥</div></div>
+          <p class="muted" style="margin:0 0 12px;">重置后旧密钥立即失效，需要同步更新前端配置。</p>
           <button class="danger sm" onclick="rotateProxyKey()">重新生成总密钥</button>
         </div>
 
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">
-              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              配置备份与恢复
-            </div>
-          </div>
+          <div class="card-header"><div class="card-title">配置备份与恢复</div></div>
           <div class="row-tight">
             <button class="sm" onclick="exportBackup()">导出 JSON 备份</button>
             <button class="sm ghost" onclick="document.getElementById('importFile').click()">导入恢复</button>
@@ -522,50 +757,41 @@
         </div>
 
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">
-              <svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              修改面板登录密码
-            </div>
-          </div>
+          <div class="card-header"><div class="card-title">修改面板登录密码</div></div>
           <input id="oldPwd" type="password" placeholder="当前密码" />
           <input id="newPwd" type="password" placeholder="新密码（至少 6 位）" />
           <button class="primary sm" style="margin-top:12px;" onclick="changePassword()">保存新密码</button>
         </div>
 
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">
-              <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              已加载的反代插件（providers/）
-            </div>
-          </div>
+          <div class="card-header"><div class="card-title">已加载的反代插件（providers/）</div></div>
           <div id="providerList" class="muted"></div>
         </div>
 
-        <button class="danger" style="width:100%;padding:12px;border-radius:16px;" onclick="logout()">
-          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          退出登录
-        </button>
+        <button class="danger" style="width:100%;padding:12px;border-radius:16px;" onclick="logout()">退出登录</button>
       </section>
     </main>
 
-    <!-- 底部悬浮导航 -->
+    <!-- 全液态玻璃底部悬浮栏（可手指左右滑动切换 + 中间加号上传 + 图标放大） -->
     <div class="nav-wrap">
-      <nav class="bottom-nav">
-        <button class="nav-btn active" onclick="switchTab('dashboard', this)">
+      <nav id="liquidNav" class="liquid-bar">
+        <div id="liquidIndicator" class="liquid-indicator"></div>
+        <button class="liquid-tab active" data-idx="0" data-page="dashboard" onclick="goTab(0)">
           <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
           <span>概览</span>
         </button>
-        <button class="nav-btn" onclick="switchTab('channels', this)">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg>
+        <button class="liquid-tab" data-idx="1" data-page="channels" onclick="goTab(1)">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
           <span>渠道</span>
         </button>
-        <button class="nav-btn" onclick="switchTab('logs', this)">
+        <button class="liquid-plus" onclick="openAddModal()" aria-label="上传与添加凭证">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button class="liquid-tab" data-idx="3" data-page="logs" onclick="goTab(3)">
           <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
           <span>日志</span>
         </button>
-        <button class="nav-btn" onclick="switchTab('settings', this)">
+        <button class="liquid-tab" data-idx="4" data-page="settings" onclick="goTab(4)">
           <svg class="icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
           <span>设置</span>
         </button>
@@ -573,115 +799,112 @@
     </div>
   </div>
 
-  <!-- 零配置添加凭证弹窗（4 种方式全部内置） -->
+  <!-- 两层结构「上传 / 添加凭证」弹窗：第一层先选平台，第二层选该平台接入方式 -->
   <div id="addModal" class="modal-mask" onclick="if(event.target===this) closeAddModal()">
     <div class="modal">
-      <div class="row">
-        <strong style="font-size:16.5px;">添加凭证（自动识别）</strong>
-        <button class="icon-only ghost" onclick="closeAddModal()" aria-label="关闭">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <div class="row" style="margin-bottom:8px;">
+        <strong style="font-size:17px;">添加凭证</strong>
+        <button class="dialog-close" onclick="closeAddModal()" aria-label="关闭">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
-      <div class="method-tabs">
-        <button class="method-tab active" data-tab="oauth" onclick="switchMethodTab('oauth', this)">三步授权</button>
-        <button class="method-tab" data-tab="device" onclick="switchMethodTab('device', this)">设备码</button>
-        <button class="method-tab" data-tab="upload" onclick="switchMethodTab('upload', this)">上传凭证</button>
-        <button class="method-tab" data-tab="apikey" onclick="switchMethodTab('apikey', this)">API Key</button>
-      </div>
+      <!-- 第一层：平台胶囊栏（动态读取 providers/） -->
+      <div id="addPlatformPills" class="platform-pills"></div>
 
-      <!-- 方式 1：Kiro 三步授权（GitHub / Google） -->
-      <div id="pane-oauth" class="method-pane active">
-        <div class="step-box">
-          <div class="step-row"><span class="step-num">1</span><span>选择 GitHub 或 Google，点击下方按钮前往 Kiro 官方授权。</span></div>
-          <div class="step-row"><span class="step-num">2</span><span>授权后会跳到一个显示<strong>「无法访问」</strong>的页面，直接<strong>完整复制地址栏网址</strong>。</span></div>
-          <div class="step-row"><span class="step-num">3</span><span>粘到下方点提交，后台自动换取凭证并识别 <strong>Free / Pro 与真实额度</strong>。</span></div>
+      <!-- Kiro 专属区 -->
+      <div id="add-kiro" style="display:none;">
+        <div class="sub-seg">
+          <button class="sub-seg-btn active" data-ksub="social" onclick="switchKiroSub('social', this)">三步授权</button>
+          <button class="sub-seg-btn" data-ksub="device" onclick="switchKiroSub('device', this)">设备码</button>
+          <button class="sub-seg-btn" data-ksub="upload" onclick="switchKiroSub('upload', this)">上传凭证</button>
         </div>
-        <div class="grid-2" style="margin-bottom:10px;">
-          <button class="primary" onclick="startKiroSocial('Github', this)">GitHub 授权登录</button>
-          <button onclick="startKiroSocial('Google', this)">Google 授权登录</button>
-        </div>
-        <div id="socialAuthLinkBox" style="display:none;margin-bottom:10px;" class="endpoint-box">
-          <div class="endpoint-label">已生成官方授权链接</div>
-          <div class="row">
-            <a id="socialAuthHref" href="#" target="_blank" style="font-size:13px;font-weight:600;color:var(--ink);">点击打开官方登录页</a>
-            <button class="sm" onclick="copyWithFeedback(document.getElementById('socialAuthHref').href, this)">复制链接</button>
+
+        <div id="ksub-social">
+          <div class="step-box">
+            <div class="step-row"><span class="step-num">1</span><span>选 GitHub 或 Google 打开 Kiro 官方授权页。</span></div>
+            <div class="step-row"><span class="step-num">2</span><span>跳到「无法访问」页面后，完整复制地址栏网址。</span></div>
+            <div class="step-row"><span class="step-num">3</span><span>粘进下方提交，自动识别 Free / Pro 与真实额度。</span></div>
           </div>
-        </div>
-        <label class="field-label">粘贴跳转后的完整网址（含 code=...）</label>
-        <textarea id="socialCallbackUrl" placeholder="http://localhost:49153/oauth/callback?code=..."></textarea>
-        <input id="socialName" type="text" placeholder="账号备注名（可留空自动识别）" />
-        <button id="socialSubmitBtn" class="primary" style="width:100%;margin-top:12px;padding:11px;" onclick="completeKiroSocial()">提交并自动识别</button>
-      </div>
-
-      <!-- 方式 2：AWS Builder ID 设备码登录 -->
-      <div id="pane-device" class="method-pane">
-        <div class="step-box">
-          <div class="step-row"><span class="step-num">1</span><span>点下方按钮生成 AWS Builder ID 专属授权码。</span></div>
-          <div class="step-row"><span class="step-num">2</span><span>打开官方页面确认授权，无需复制网址，切回来自动完成绑定并识别额度。</span></div>
-        </div>
-        <input id="deviceName" type="text" placeholder="账号备注名（可留空自动识别）" />
-        <button id="deviceStartBtn" class="primary" style="width:100%;margin-top:10px;padding:11px;" onclick="startKiroDevice()">生成 Builder ID 授权码</button>
-        <div id="deviceCodeBox" style="display:none;margin-top:12px;">
-          <div class="code-display">
-            <div class="muted">验证码</div>
-            <div class="code-big" id="deviceUserCode">----</div>
-            <div style="margin-top:10px;" class="row-tight" style="justify-content:center;">
-              <a id="deviceVerifyUrl" href="#" target="_blank" style="display:inline-block;padding:8px 14px;background:var(--ink);color:#fff;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;">打开 AWS 授权页</a>
-              <button class="sm" onclick="copyWithFeedback(document.getElementById('deviceUserCode').textContent, this)">复制验证码</button>
+          <div class="grid-2" style="margin-bottom:10px;">
+            <button class="primary" onclick="startKiroSocial('Github', this)">GitHub 授权</button>
+            <button class="ghost" onclick="startKiroSocial('Google', this)">Google 授权</button>
+          </div>
+          <div id="socialAuthLinkBox" style="display:none;margin-bottom:10px;" class="endpoint-box">
+            <div class="row">
+              <a id="socialAuthHref" href="#" target="_blank" style="font-size:13px;font-weight:600;color:#111111;">点击打开官方登录页</a>
+              <button class="sm" onclick="copyWithFeedback(document.getElementById('socialAuthHref').href, this)">复制链接</button>
             </div>
-            <div id="devicePollStatus" class="muted" style="margin-top:10px;">正在等待你在浏览器点确认...</div>
+          </div>
+          <textarea id="socialCallbackUrl" placeholder="粘贴跳转后的完整网址（含 code=...）"></textarea>
+          <input id="socialName" type="text" placeholder="备注名（可留空自动识别）" />
+          <button id="socialSubmitBtn" class="primary" style="width:100%;margin-top:12px;padding:12px;border-radius:14px;" onclick="completeKiroSocial()">提交并自动识别</button>
+        </div>
+
+        <div id="ksub-device" style="display:none;">
+          <div class="step-box">
+            <div class="step-row"><span class="step-num">1</span><span>生成 AWS Builder ID 授权码并打开官方页确认。</span></div>
+            <div class="step-row"><span class="step-num">2</span><span>切回来自动完成绑定，自动同步等级与额度。</span></div>
+          </div>
+          <input id="deviceName" type="text" placeholder="备注名（可留空自动识别）" />
+          <button id="deviceStartBtn" class="primary" style="width:100%;margin-top:10px;padding:12px;border-radius:14px;" onclick="startKiroDevice()">生成 Builder ID 授权码</button>
+          <div id="deviceCodeBox" style="display:none;">
+            <div class="code-display">
+              <div class="muted">验证码</div>
+              <div class="code-big" id="deviceUserCode">----</div>
+              <div style="margin-top:10px;display:flex;justify-content:center;gap:8px;">
+                <a id="deviceVerifyUrl" href="#" target="_blank" style="padding:8px 14px;background:#111111;color:#ffffff;border-radius:10px;text-decoration:none;font-size:12.5px;font-weight:600;">打开 AWS 授权页</a>
+                <button class="sm" onclick="copyWithFeedback(document.getElementById('deviceUserCode').textContent, this)">复制验证码</button>
+              </div>
+              <div id="devicePollStatus" class="muted" style="margin-top:10px;">等待你在浏览器点确认...</div>
+            </div>
           </div>
         </div>
+
+        <div id="ksub-upload" style="display:none;">
+          <button class="ghost" style="width:100%;padding:13px;border-radius:14px;margin-bottom:8px;" onclick="document.getElementById('credFileInput').click()">
+            <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            选择本地 .json 凭证文件（支持批量）
+          </button>
+          <input id="credFileInput" type="file" accept=".json,application/json,text/plain" style="display:none;" onchange="loadCredFile(this)" />
+          <textarea id="uploadRawText" placeholder="或直接粘贴 JSON / aorAAAAAG... RefreshToken"></textarea>
+          <input id="uploadName" type="text" placeholder="备注名（留空自动识别）" />
+          <button id="uploadSubmitBtn" class="primary" style="width:100%;margin-top:12px;padding:12px;border-radius:14px;" onclick="submitSmartImport('upload')">自动识别并接入</button>
+        </div>
       </div>
 
-      <!-- 方式 3：上传 JSON / 粘贴 Token 自动识别 -->
-      <div id="pane-upload" class="method-pane">
-        <div class="step-box">
-          直接上传 Kiro 导出的 <strong>.json 文件</strong>（支持单号或多号批量），或直接粘贴 <strong>aorAAAAAG...</strong> 凭证，后台自动识别账号、等级与额度。
-        </div>
-        <button class="ghost" style="width:100%;padding:12px;border:1px dashed var(--border-strong);" onclick="document.getElementById('credFileInput').click()">
-          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          选择本地 .json 凭证文件
-        </button>
-        <input id="credFileInput" type="file" accept=".json,application/json,text/plain" style="display:none;" onchange="loadCredFile(this)" />
-        <label class="field-label">或直接粘贴 JSON / RefreshToken</label>
-        <textarea id="uploadRawText" placeholder="粘贴整段 JSON 或 aorAAAAAG..."></textarea>
-        <input id="uploadName" type="text" placeholder="账号备注名（留空自动命名）" />
-        <button id="uploadSubmitBtn" class="primary" style="width:100%;margin-top:12px;padding:11px;" onclick="submitSmartImport('upload')">自动识别并接入</button>
-      </div>
-
-      <!-- 方式 4：官方 API Key / 万能 /v1 接入 -->
-      <div id="pane-apikey" class="method-pane">
-        <div class="step-box">
-          粘贴 <strong>Google AI Studio（AIza...）</strong> 自动识别并拉取 Gemini 模型；若接其他中转站（DeepSeek / NVIDIA NIM 等），填入接口网址和 Key 即可自动拉取模型。
-        </div>
-        <label class="field-label">粘贴 API Key（支持多行轮询）</label>
-        <textarea id="apiKeyRawText" placeholder="例如 AIzaSy...（多把 Key 每行一把）&#10;或 sk-..."></textarea>
-        <label class="field-label">接口地址（Google AIza 密钥请留空，其他中转站填 /v1 地址）</label>
-        <input id="apiKeyBaseUrl" type="url" placeholder="留空 = 自动识别 Google AI Studio；中转站填 https://.../v1" />
+      <!-- Google AI Studio (Gemini) 专属区 -->
+      <div id="add-gemini" style="display:none;">
+        <div class="step-box">粘贴 Google AI Studio 官方 <strong>AIza...</strong> 密钥（多把 Key 每行一把自动轮询），后台自动测速接入。</div>
+        <textarea id="gemKeys" placeholder="AIzaSy...（支持多行轮询）"></textarea>
         <div class="grid-2">
-          <div>
-            <label class="field-label">备注名（可选）</label>
-            <input id="apiKeyName" type="text" placeholder="留空自动命名" />
-          </div>
-          <div>
-            <label class="field-label">等级标签（可选）</label>
-            <input id="apiKeyTier" type="text" list="tierOptions" placeholder="Free / Pro" />
-          </div>
+          <input id="gemName" type="text" placeholder="备注名（可留空）" />
+          <input id="gemTier" type="text" list="tierOptions" placeholder="Free / Pro（可选）" />
         </div>
-        <button id="apiKeySubmitBtn" class="primary" style="width:100%;margin-top:14px;padding:11px;" onclick="submitSmartImport('apikey')">自动识别并接入</button>
+        <button id="gemSubmitBtn" class="primary" style="width:100%;margin-top:14px;padding:12px;border-radius:14px;" onclick="submitSmartImport('gemini')">自动接入 Gemini</button>
+      </div>
+
+      <!-- 万能 /v1 与其他自定义插件区 -->
+      <div id="add-compat" style="display:none;">
+        <div class="step-box">填入任意兼容 OpenAI /v1 格式的接口地址与 API Key（DeepSeek / NVIDIA NIM / 其他反代）。</div>
+        <input id="compatUrl" type="url" placeholder="接口地址，如 https://api.deepseek.com/v1" />
+        <textarea id="compatKeys" placeholder="API Key（支持多行轮询）"></textarea>
+        <div class="grid-2">
+          <input id="compatName" type="text" placeholder="备注名（可留空）" />
+          <input id="compatTier" type="text" list="tierOptions" placeholder="Free / Pro（可选）" />
+        </div>
+        <button id="compatSubmitBtn" class="primary" style="width:100%;margin-top:14px;padding:12px;border-radius:14px;" onclick="submitSmartImport('compat')">自动接入渠道</button>
       </div>
     </div>
   </div>
 
-  <!-- 编辑已有账号弹窗（平时隐藏高级设置） -->
+  <!-- 编辑已有账号弹窗（清爽无多余拉取按钮） -->
   <div id="editModal" class="modal-mask" onclick="if(event.target===this) closeEditModal()">
     <div class="modal">
-      <div class="row" style="margin-bottom:6px;">
-        <strong style="font-size:16.5px;">编辑账号</strong>
-        <button class="icon-only ghost" onclick="closeEditModal()" aria-label="关闭">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <div class="row" style="margin-bottom:8px;">
+        <strong style="font-size:17px;">编辑账号</strong>
+        <button class="dialog-close" onclick="closeEditModal()" aria-label="关闭">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
       <input type="hidden" id="editChannelId" />
@@ -698,57 +921,36 @@
         </div>
       </div>
       <datalist id="tierOptions">
-        <option value="Free"></option>
-        <option value="Pro"></option>
-        <option value="Plus"></option>
-        <option value="备用"></option>
+        <option value="Free"></option><option value="Pro"></option><option value="Plus"></option><option value="备用"></option>
       </datalist>
 
       <div id="editDynamicFields"></div>
 
-      <div class="row" style="margin-top:13px;">
-        <label class="field-label" style="margin:0;">可用模型（留空 = 通配）</label>
-        <button id="editFetchBtn" type="button" class="sm ghost" onclick="fetchModelsInEdit()">拉取模型</button>
-      </div>
-      <input id="editModels" type="text" />
-      <div id="editFetchedBox" style="display:none;"></div>
-
       <div class="accordion">
         <button class="accordion-head" type="button" onclick="this.parentElement.classList.toggle('open')">
-          <span>高级设置（额度上限 / 优先级，一般不用改）</span>
+          <span>高级设置（模型限定 / 额度 / 优先级）</span>
           <svg class="icon icon-sm accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div class="accordion-body">
           <div class="accordion-inner">
+            <label class="field-label">限定模型（留空表示全部通配）</label>
+            <input id="editModels" type="text" placeholder="留空即可" />
             <div class="grid-2">
-              <div>
-                <label class="field-label">额度上限（0=不限）</label>
-                <input id="editQuotaLimit" type="number" min="0" value="0" />
-              </div>
-              <div>
-                <label class="field-label">已用次数</label>
-                <input id="editQuotaUsed" type="number" min="0" value="0" />
-              </div>
+              <div><label class="field-label">额度上限</label><input id="editQuotaLimit" type="number" min="0" value="0" /></div>
+              <div><label class="field-label">已用次数</label><input id="editQuotaUsed" type="number" min="0" value="0" /></div>
             </div>
             <div class="grid-2">
               <div>
                 <label class="field-label">重置周期</label>
-                <select id="editQuotaCycle">
-                  <option value="none">不自动重置</option>
-                  <option value="monthly">每月重置</option>
-                  <option value="daily">每日重置</option>
-                </select>
+                <select id="editQuotaCycle"><option value="none">不自动重置</option><option value="monthly">每月重置</option><option value="daily">每日重置</option></select>
               </div>
-              <div>
-                <label class="field-label">优先级（越大越先用）</label>
-                <input id="editPriority" type="number" value="10" />
-              </div>
+              <div><label class="field-label">优先级</label><input id="editPriority" type="number" value="10" /></div>
             </div>
           </div>
         </div>
       </div>
 
-      <button class="primary" style="width:100%;margin-top:16px;padding:12px;" onclick="saveEditedChannel()">保存修改</button>
+      <button class="primary" style="width:100%;margin-top:16px;padding:12px;border-radius:14px;" onclick="saveEditedChannel()">保存修改</button>
     </div>
   </div>
 
@@ -759,10 +961,40 @@
     let currentProxyKey = "";
     let showFullKey = false;
     let onlyErrors = false;
+    let activeTabIdx = 0;
+    let activeFolderType = null;
     let socialSessionId = "";
     let deviceSessionId = "";
     let devicePollTimer = null;
-    let editFetchedModels = [];
+
+    // 高级低饱和文件袋随机配色池（黑、深雾蓝、鼠尾草、暖石棕、烟熏紫、深松绿）
+    const FOLDER_PALETTES = [
+      { back: "#161618", hi: "#3c3c40", front: "#212124", lo: "#121214" },
+      { back: "#243447", hi: "#47607c", front: "#2f435a", lo: "#1c2938" },
+      { back: "#2b3d34", hi: "#4e6b5c", front: "#364c41", lo: "#202e27" },
+      { back: "#3c3532", hi: "#625853", front: "#4b433f", lo: "#2d2825" },
+      { back: "#353145", hi: "#595270", front: "#433e56", lo: "#272434" },
+      { back: "#2d3740", hi: "#51616f", front: "#394652", lo: "#222a31" }
+    ];
+    const folderColorMap = {};
+    function getFolderPalette(key) {
+      if (!folderColorMap[key]) {
+        folderColorMap[key] = FOLDER_PALETTES[Math.floor(Math.random() * FOLDER_PALETTES.length)];
+      }
+      return folderColorMap[key];
+    }
+
+    // 精准品牌矢量图标：Gemini 四角星 / Claude 放射星芒 / OpenAI 节点
+    function getBrandSvg(ptype, models = "") {
+      const m = (ptype + " " + models).toLowerCase();
+      if (m.includes("gemini")) {
+        return '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C12.8 7.4 16.6 11.2 22 12C16.6 12.8 12.8 16.6 12 22C11.2 16.6 7.4 12.8 2 12C7.4 11.2 11.2 7.4 12 2Z"/></svg>';
+      }
+      if (m.includes("kiro") || m.includes("claude")) {
+        return '<svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.1" stroke-linecap="round"><line x1="12" y1="2.5" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="21.5" y2="12"/><line x1="5.3" y1="5.3" x2="18.7" y2="18.7"/><line x1="18.7" y1="5.3" x2="5.3" y2="18.7"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/></svg>';
+      }
+      return '<svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>';
+    }
 
     const ICONS = {
       zap: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
@@ -770,8 +1002,7 @@
       edit: '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
       trash: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>',
       check: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
-      alert: '<svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
-      plus: '<svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+      alert: '<svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
     };
 
     function toast(msg) {
@@ -779,40 +1010,25 @@
       el.textContent = msg;
       el.classList.add("show");
       clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => el.classList.remove("show"), 2400);
+      window.__toastTimer = setTimeout(() => el.classList.remove("show"), 2300);
     }
 
     async function copyWithFeedback(text, btn) {
       if (!text) { toast("内容为空"); return; }
       let ok = false;
-      try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(text);
-          ok = true;
-        }
-      } catch {}
+      try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); ok = true; } } catch {}
       if (!ok) {
         const ta = document.createElement("textarea");
-        ta.value = text;
-        ta.setAttribute("readonly", "");
-        ta.style.position = "fixed";
-        ta.style.left = "-9999px";
-        document.body.appendChild(ta);
-        ta.select();
-        ta.setSelectionRange(0, text.length);
+        ta.value = text; ta.setAttribute("readonly", "");
+        ta.style.position = "fixed"; ta.style.left = "-9999px";
+        document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
         try { ok = document.execCommand("copy"); } catch {}
         document.body.removeChild(ta);
       }
       if (ok) {
-        toast("已复制到剪贴板");
-        if (btn) {
-          const orig = btn.innerHTML;
-          btn.innerHTML = `${ICONS.check}已复制`;
-          setTimeout(() => { btn.innerHTML = orig; }, 1400);
-        }
-      } else {
-        toast("请点「显示」后长按手动复制");
-      }
+        toast("已复制");
+        if (btn) { const orig = btn.innerHTML; btn.textContent = "已复制"; setTimeout(() => { btn.innerHTML = orig; }, 1300); }
+      } else { toast("请点「显示」后长按复制"); }
     }
 
     function escapeHtml(s) {
@@ -823,15 +1039,80 @@
       const headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
       if (token) headers["Authorization"] = "Bearer " + token;
       const res = await fetch(path, Object.assign({}, opts, { headers }));
-      if (res.status === 401 && path !== "/api/login") {
-        logout();
-        throw new Error("登录已失效");
-      }
+      if (res.status === 401 && path !== "/api/login") { logout(); throw new Error("登录已失效"); }
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.detail || ("请求失败 " + res.status));
       return data;
     }
 
+    /* ---------- 可滑动液态玻璃底栏 ---------- */
+    const TAB_INDEX_TO_PAGE = { 0: "dashboard", 1: "channels", 3: "logs", 4: "settings" };
+
+    function setIndicatorSlot(idx) {
+      const ind = document.getElementById("liquidIndicator");
+      if (ind) ind.style.transform = `translateX(${idx * 100}%)`;
+    }
+
+    function goTab(idx) {
+      if (!(idx in TAB_INDEX_TO_PAGE)) return;
+      activeTabIdx = idx;
+      setIndicatorSlot(idx);
+      const page = TAB_INDEX_TO_PAGE[idx];
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.getElementById("page-" + page).classList.add("active");
+      document.querySelectorAll(".liquid-tab").forEach(t => {
+        t.classList.toggle("active", parseInt(t.dataset.idx, 10) === idx);
+      });
+      if (page === "logs") loadLogs();
+      if (page === "channels") loadChannels();
+      if (page === "dashboard") loadStats();
+    }
+
+    (function initLiquidSwipe() {
+      const nav = document.getElementById("liquidNav");
+      const ind = document.getElementById("liquidIndicator");
+      let dragging = false;
+      let startX = 0;
+
+      function slotFromClientX(clientX) {
+        const rect = nav.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(0.999, (clientX - rect.left) / rect.width));
+        return Math.floor(ratio * 5);
+      }
+
+      nav.addEventListener("touchstart", e => {
+        if (e.target.closest(".liquid-plus")) return;
+        dragging = true;
+        startX = e.touches[0].clientX;
+        nav.classList.add("dragging");
+      }, { passive: true });
+
+      nav.addEventListener("touchmove", e => {
+        if (!dragging) return;
+        const rect = nav.getBoundingClientRect();
+        const x = e.touches[0].clientX;
+        if (Math.abs(x - startX) < 6) return;
+        const pct = Math.max(0, Math.min(4, ((x - rect.left) / rect.width) * 5 - 0.5));
+        ind.style.transform = `translateX(${pct * 100}%)`;
+        const slot = slotFromClientX(x);
+        if (slot in TAB_INDEX_TO_PAGE && slot !== activeTabIdx) {
+          activeTabIdx = slot;
+          const page = TAB_INDEX_TO_PAGE[slot];
+          document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+          document.getElementById("page-" + page).classList.add("active");
+          document.querySelectorAll(".liquid-tab").forEach(t => t.classList.toggle("active", parseInt(t.dataset.idx, 10) === slot));
+        }
+      }, { passive: true });
+
+      nav.addEventListener("touchend", () => {
+        if (!dragging) return;
+        dragging = false;
+        nav.classList.remove("dragging");
+        goTab(activeTabIdx);
+      });
+    })();
+
+    /* ---------- Auth & Init ---------- */
     async function doLogin() {
       const pwd = document.getElementById("loginPwd").value;
       document.getElementById("loginErr").textContent = "";
@@ -840,26 +1121,13 @@
         token = res.token;
         localStorage.setItem("hub_token", token);
         showApp();
-      } catch (e) {
-        document.getElementById("loginErr").textContent = e.message;
-      }
+      } catch (e) { document.getElementById("loginErr").textContent = e.message; }
     }
 
     function logout() {
-      token = "";
-      localStorage.removeItem("hub_token");
+      token = ""; localStorage.removeItem("hub_token");
       document.getElementById("appView").style.display = "none";
       document.getElementById("loginShell").style.display = "flex";
-    }
-
-    function switchTab(name, btn) {
-      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-      document.getElementById("page-" + name).classList.add("active");
-      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      if (name === "logs") loadLogs();
-      if (name === "channels") loadChannels();
-      if (name === "dashboard") loadStats();
     }
 
     function renderProxyKey() {
@@ -867,17 +1135,15 @@
       const btn = document.getElementById("toggleKeyBtn");
       if (!currentProxyKey) { el.textContent = "未生成"; return; }
       el.textContent = showFullKey ? currentProxyKey : (currentProxyKey.slice(0, 12) + "••••••••" + currentProxyKey.slice(-4));
-      btn.innerHTML = showFullKey
-        ? '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><line x1="1" y1="1" x2="23" y2="23"/></svg>隐藏'
-        : '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>显示';
+      btn.textContent = showFullKey ? "隐藏" : "显示";
     }
-
     function toggleProxyKeyVisible() { showFullKey = !showFullKey; renderProxyKey(); }
 
     async function showApp() {
       document.getElementById("loginShell").style.display = "none";
       document.getElementById("appView").style.display = "block";
       document.getElementById("proxyBaseUrl").textContent = window.location.origin + "/v1";
+      setIndicatorSlot(activeTabIdx);
       await refreshAll(false);
     }
 
@@ -888,9 +1154,7 @@
         await loadProviders();
         await Promise.all([loadStats(), loadChannels(), loadLogs()]);
         if (manual) toast("已刷新");
-      } finally {
-        if (svg) setTimeout(() => svg.classList.remove("spin"), 280);
-      }
+      } finally { if (svg) setTimeout(() => svg.classList.remove("spin"), 280); }
     }
 
     async function loadProviders() {
@@ -898,11 +1162,8 @@
       providers = data.providers || [];
       document.getElementById("providerList").innerHTML = providers.map(p =>
         `<div class="list-row">
-          <div class="row">
-            <strong style="font-size:13.5px;">${escapeHtml(p.label)}</strong>
-            <span class="badge badge-neutral">${escapeHtml(p.provider_type)}</span>
-          </div>
-          <div class="field-help">${escapeHtml(p.description)}</div>
+          <div class="row"><strong style="font-size:13.5px;">${escapeHtml(p.label)}</strong><span class="badge badge-neutral">${escapeHtml(p.provider_type)}</span></div>
+          <div class="muted" style="margin-top:3px;">${escapeHtml(p.description)}</div>
         </div>`
       ).join("") || "暂无插件";
     }
@@ -929,103 +1190,156 @@
         : "暂无调用记录";
     }
 
+    /* ---------- 渠道文件夹网格 + 二级详情 ---------- */
+    function shortProviderName(ptype, fallback) {
+      if (ptype === "kiro_native") return "Kiro";
+      if (ptype === "gemini_official") return "Gemini";
+      if (ptype === "openai_compat") return "通用 /v1";
+      return fallback || ptype;
+    }
+
     function tierBadge(tier) {
       if (!tier) return "";
       const lower = tier.toLowerCase();
       const cls = lower.includes("pro") || lower.includes("plus") ? "badge-pro" : lower.includes("free") ? "badge-ok" : "badge-neutral";
       return `<span class="badge ${cls}">${escapeHtml(tier)}</span>`;
     }
-
     function cycleText(cycle) { return cycle === "monthly" ? "本月" : cycle === "daily" ? "今日" : "累计"; }
 
     async function loadChannels() {
       const data = await api("/api/channels");
       channelsCache = data.channels || [];
-      const container = document.getElementById("channelsList");
-      if (!channelsCache.length) {
-        container.innerHTML = `<div class="card muted" style="text-align:center;padding:30px 16px;">还没有凭证，点右上角「添加凭证」一键登录或粘贴导入</div>`;
-        return;
-      }
+      renderFolderGrid();
+      if (activeFolderType) renderFolderDetail(activeFolderType);
+    }
+
+    function renderFolderGrid() {
+      const grid = document.getElementById("folderGrid");
       const groups = {};
-      for (const ch of channelsCache) {
-        if (!groups[ch.provider_type]) groups[ch.provider_type] = [];
-        groups[ch.provider_type].push(ch);
+      // 始终显示已加载的插件文件夹 + 已有渠道分组
+      for (const p of providers) {
+        groups[p.provider_type] = { label: shortProviderName(p.provider_type, p.label), items: [] };
       }
-      container.innerHTML = Object.entries(groups).map(([ptype, list]) => {
-        const pMeta = providers.find(p => p.provider_type === ptype);
-        const gLabel = pMeta ? pMeta.label : ptype;
-        const addTab = ptype === "kiro_native" ? "oauth" : "apikey";
-        const cardsHtml = list.map(ch => {
-          const statusBadge = ch.last_status === "ok"
-            ? `<span class="badge badge-ok">${ICONS.check}${ch.last_latency_ms}ms</span>`
-            : ch.last_status === "error"
-              ? `<span class="badge badge-err">${ICONS.alert}异常</span>`
-              : `<span class="badge badge-neutral">未测速</span>`;
-          const errHtml = ch.last_error ? `<div class="err-box">${escapeHtml(ch.last_error)}</div>` : "";
-          let quotaHtml = "";
-          if (ch.quota_limit > 0) {
-            const pct = Math.min(100, Math.round((ch.quota_used / ch.quota_limit) * 100));
-            const fillCls = pct >= 100 ? "full" : pct >= 80 ? "warn" : "";
-            quotaHtml = `<div class="quota-wrap">
-              <div class="row">
-                <span class="muted">${cycleText(ch.quota_cycle)}额度：<strong style="color:var(--ink);">${ch.quota_used} / ${ch.quota_limit}</strong></span>
-                <button class="sm ghost" onclick="calibrateQuota(${ch.id}, ${ch.quota_used}, ${ch.quota_limit})">校准</button>
-              </div>
-              <div class="quota-bar-bg"><div class="quota-bar-fill ${fillCls}" style="width:${pct}%"></div></div>
-            </div>`;
-          }
-          return `<div class="card">
-            <div class="row">
-              <div class="row-tight">
-                <strong style="font-size:15px;">${escapeHtml(ch.name)}</strong>
-                ${tierBadge(ch.tier)}
-              </div>
-              <label class="switch">
-                <input type="checkbox" ${ch.enabled ? "checked" : ""} onchange="toggleChannel(${ch.id}, this.checked)" />
-                <span class="slider"></span>
-              </label>
+      for (const ch of channelsCache) {
+        if (!groups[ch.provider_type]) groups[ch.provider_type] = { label: shortProviderName(ch.provider_type, ch.provider_type), items: [] };
+        groups[ch.provider_type].items.push(ch);
+      }
+
+      grid.innerHTML = Object.entries(groups).map(([ptype, g]) => {
+        const pal = getFolderPalette(ptype);
+        const enabledCount = g.items.filter(x => x.enabled).length;
+        const allModels = g.items.map(x => x.models || "").join(" ");
+        const brandSvg = getBrandSvg(ptype, allModels);
+        return `<div class="folder-item" onclick="openFolderDetail('${ptype}')">
+          <div class="folder-shell" style="--f-back:${pal.back};--f-front-hi:${pal.hi};--f-front:${pal.front};--f-front-lo:${pal.lo};">
+            <div class="folder-tab"></div>
+            <div class="folder-back-body"></div>
+            <div class="folder-paper folder-paper-left"><div class="paper-line"></div><div class="paper-line short"></div></div>
+            <div class="folder-paper folder-paper-right"><div class="paper-line"></div></div>
+            <div class="folder-paper folder-paper-mid"><div class="paper-line"></div><div class="paper-line"></div><div class="paper-line short"></div></div>
+            <div class="folder-front">
+              <div class="folder-brand-icon">${brandSvg}</div>
             </div>
-            <div class="muted" style="margin:6px 0 4px;">
-              凭证：<span class="mono">${escapeHtml(ch.credential_hint || "-")}</span>
-            </div>
-            <div class="muted" style="margin-bottom:10px;">
-              模型：${ch.models ? escapeHtml(ch.models) : "全部通配 (*)"}
-            </div>
-            <div class="row">
-              <div>${statusBadge}</div>
-              <div class="row-tight">
-                <button class="sm ghost" onclick="testChannel(${ch.id}, this)">${ICONS.zap}测速</button>
-                <button class="sm ghost" onclick="chatTestChannel(${ch.id}, this)">${ICONS.chat}试聊</button>
-                <button class="sm ghost" onclick="openEditModal(${ch.id})">${ICONS.edit}编辑</button>
-                <button class="sm danger" onclick="deleteChannel(${ch.id})">${ICONS.trash}</button>
-              </div>
-            </div>
-            ${quotaHtml}
-            <div id="ch-reply-${ch.id}"></div>
-            ${errHtml}
-          </div>`;
-        }).join("");
-        return `<div class="group-block">
-          <div class="group-head">
-            <div class="group-title">${escapeHtml(gLabel)} <span class="badge badge-neutral">${list.length} 个账号</span></div>
-            <button class="sm ghost" onclick="openAddModal('${addTab}')">${ICONS.plus}加同款账号</button>
           </div>
-          ${cardsHtml}
+          <div class="folder-label">${escapeHtml(g.label)}</div>
+          <div class="folder-sub">${g.items.length ? `${enabledCount} / ${g.items.length} 启用` : "空文件夹"}</div>
         </div>`;
       }).join("");
     }
 
-    /* ---------- Add Modal (4 Methods) ---------- */
-    function openAddModal(tab = "oauth") {
+    function openFolderDetail(ptype) {
+      activeFolderType = ptype;
+      document.getElementById("folderGridView").style.display = "none";
+      document.getElementById("folderDetailView").style.display = "block";
+      const pMeta = providers.find(p => p.provider_type === ptype);
+      document.getElementById("folderDetailTitle").textContent = shortProviderName(ptype, pMeta ? pMeta.label : ptype);
+      renderFolderDetail(ptype);
+    }
+
+    function closeFolderDetail() {
+      activeFolderType = null;
+      document.getElementById("folderDetailView").style.display = "none";
+      document.getElementById("folderGridView").style.display = "block";
+    }
+
+    function renderFolderDetail(ptype) {
+      const list = channelsCache.filter(c => c.provider_type === ptype);
+      const box = document.getElementById("folderAccountsList");
+      if (!list.length) {
+        box.innerHTML = `<div class="card muted" style="text-align:center;padding:30px 16px;">这个文件夹还是空的，点右上角「添加同款」或底部 + 接入账号</div>`;
+        return;
+      }
+      box.innerHTML = list.map(ch => {
+        const statusBadge = ch.last_status === "ok"
+          ? `<span class="badge badge-ok">${ICONS.check}${ch.last_latency_ms}ms</span>`
+          : ch.last_status === "error"
+            ? `<span class="badge badge-err">${ICONS.alert}异常</span>`
+            : `<span class="badge badge-neutral">未测速</span>`;
+        const errHtml = ch.last_error ? `<div class="err-box">${escapeHtml(ch.last_error)}</div>` : "";
+        let quotaHtml = "";
+        if (ch.quota_limit > 0) {
+          const pct = Math.min(100, Math.round((ch.quota_used / ch.quota_limit) * 100));
+          const fillCls = pct >= 100 ? "full" : pct >= 80 ? "warn" : "";
+          quotaHtml = `<div class="quota-wrap">
+            <div class="row">
+              <span class="muted">${cycleText(ch.quota_cycle)}额度：<strong style="color:#111111;">${ch.quota_used} / ${ch.quota_limit}</strong></span>
+              <button class="sm ghost" onclick="calibrateQuota(${ch.id}, ${ch.quota_used}, ${ch.quota_limit})">校准</button>
+            </div>
+            <div class="quota-bar-bg"><div class="quota-bar-fill ${fillCls}" style="width:${pct}%"></div></div>
+          </div>`;
+        }
+        return `<div class="card">
+          <div class="row">
+            <div class="row-tight">
+              <strong style="font-size:15px;">${escapeHtml(ch.name)}</strong>
+              ${tierBadge(ch.tier)}
+            </div>
+            <label class="switch">
+              <input type="checkbox" ${ch.enabled ? "checked" : ""} onchange="toggleChannel(${ch.id}, this.checked)" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="muted" style="margin:6px 0 10px;">
+            凭证：<span class="mono">${escapeHtml(ch.credential_hint || "-")}</span>
+          </div>
+          <div class="row">
+            <div>${statusBadge}</div>
+            <div class="row-tight">
+              <button class="sm ghost" onclick="testChannel(${ch.id}, this)">${ICONS.zap}测速</button>
+              <button class="sm ghost" onclick="chatTestChannel(${ch.id}, this)">${ICONS.chat}试聊</button>
+              <button class="sm ghost" onclick="openEditModal(${ch.id})">${ICONS.edit}编辑</button>
+              <button class="sm danger" onclick="deleteChannel(${ch.id})">${ICONS.trash}</button>
+            </div>
+          </div>
+          ${quotaHtml}
+          <div id="ch-reply-${ch.id}"></div>
+          ${errHtml}
+        </div>`;
+      }).join("");
+    }
+
+    /* ---------- 两层添加凭证弹窗 ---------- */
+    function openAddModal(presetType = null) {
       stopDevicePoll();
       document.getElementById("socialAuthLinkBox").style.display = "none";
       document.getElementById("deviceCodeBox").style.display = "none";
       document.getElementById("socialCallbackUrl").value = "";
       document.getElementById("uploadRawText").value = "";
-      document.getElementById("apiKeyRawText").value = "";
-      document.getElementById("apiKeyBaseUrl").value = "";
-      const btn = document.querySelector(`.method-tab[data-tab="${tab}"]`);
-      if (btn) switchMethodTab(tab, btn);
+      document.getElementById("gemKeys").value = "";
+      document.getElementById("compatUrl").value = "";
+      document.getElementById("compatKeys").value = "";
+
+      const pillsBox = document.getElementById("addPlatformPills");
+      const list = providers.length ? providers : [
+        { provider_type: "kiro_native", label: "Kiro" },
+        { provider_type: "gemini_official", label: "Gemini" },
+        { provider_type: "openai_compat", label: "通用 /v1" }
+      ];
+      const defaultType = presetType || activeFolderType || list[0].provider_type;
+      pillsBox.innerHTML = list.map(p =>
+        `<button class="p-pill ${p.provider_type === defaultType ? 'active' : ''}" onclick="selectAddPlatform('${p.provider_type}', this)">${escapeHtml(shortProviderName(p.provider_type, p.label))}</button>`
+      ).join("");
+      showAddPlatformPane(defaultType);
       document.getElementById("addModal").classList.add("show");
     }
 
@@ -1034,11 +1348,24 @@
       document.getElementById("addModal").classList.remove("show");
     }
 
-    function switchMethodTab(tab, btn) {
-      document.querySelectorAll(".method-tab").forEach(b => b.classList.remove("active"));
+    function selectAddPlatform(ptype, btn) {
+      document.querySelectorAll("#addPlatformPills .p-pill").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      document.querySelectorAll(".method-pane").forEach(p => p.classList.remove("active"));
-      document.getElementById("pane-" + tab).classList.add("active");
+      showAddPlatformPane(ptype);
+    }
+
+    function showAddPlatformPane(ptype) {
+      document.getElementById("add-kiro").style.display = ptype === "kiro_native" ? "block" : "none";
+      document.getElementById("add-gemini").style.display = ptype === "gemini_official" ? "block" : "none";
+      document.getElementById("add-compat").style.display = (ptype !== "kiro_native" && ptype !== "gemini_official") ? "block" : "none";
+    }
+
+    function switchKiroSub(sub, btn) {
+      document.querySelectorAll(".sub-seg-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      ["social", "device", "upload"].forEach(k => {
+        document.getElementById("ksub-" + k).style.display = k === sub ? "block" : "none";
+      });
     }
 
     async function startKiroSocial(idp, btn) {
@@ -1046,18 +1373,17 @@
       try {
         const res = await api("/api/oauth/kiro/social/start", { method: "POST", body: JSON.stringify({ idp }) });
         socialSessionId = res.session_id;
-        const a = document.getElementById("socialAuthHref");
-        a.href = res.auth_url;
+        document.getElementById("socialAuthHref").href = res.auth_url;
         document.getElementById("socialAuthLinkBox").style.display = "block";
         window.open(res.auth_url, "_blank");
-        toast("已生成链接，请完成登录后复制跳转网址");
+        toast("已生成链接，授权后复制跳转网址");
       } catch (e) { toast(e.message); }
       finally { btn.disabled = false; }
     }
 
     async function completeKiroSocial() {
       const url = document.getElementById("socialCallbackUrl").value.trim();
-      if (!socialSessionId) { toast("请先点击上方按钮生成授权链接"); return; }
+      if (!socialSessionId) { toast("请先点上方按钮生成授权链接"); return; }
       if (!url) { toast("请粘贴跳转后的完整网址"); return; }
       const btn = document.getElementById("socialSubmitBtn");
       btn.disabled = true; btn.textContent = "自动识别并同步额度中...";
@@ -1073,9 +1399,7 @@
       finally { btn.disabled = false; btn.textContent = "提交并自动识别"; }
     }
 
-    function stopDevicePoll() {
-      if (devicePollTimer) { clearInterval(devicePollTimer); devicePollTimer = null; }
-    }
+    function stopDevicePoll() { if (devicePollTimer) { clearInterval(devicePollTimer); devicePollTimer = null; } }
 
     async function startKiroDevice() {
       stopDevicePoll();
@@ -1086,7 +1410,7 @@
         deviceSessionId = res.session_id;
         document.getElementById("deviceUserCode").textContent = res.user_code;
         document.getElementById("deviceVerifyUrl").href = res.verification_uri;
-        document.getElementById("devicePollStatus").textContent = "等待你在 AWS 页面点确认授权...";
+        document.getElementById("devicePollStatus").textContent = "等待你在 AWS 页面点确认...";
         document.getElementById("deviceCodeBox").style.display = "block";
         devicePollTimer = setInterval(pollKiroDevice, Math.max(3, res.interval || 5) * 1000);
       } catch (e) { toast(e.message); }
@@ -1102,43 +1426,52 @@
         });
         if (res.status === "ok") {
           stopDevicePoll();
-          toast(`授权成功：${res.channel.name}（${res.channel.tier || "Free"}）`);
+          toast(`授权成功：${res.channel.name}`);
           closeAddModal();
           await Promise.all([loadChannels(), loadStats()]);
         }
-      } catch (e) {
-        stopDevicePoll();
-        document.getElementById("devicePollStatus").textContent = e.message;
-      }
+      } catch (e) { stopDevicePoll(); document.getElementById("devicePollStatus").textContent = e.message; }
     }
 
     async function loadCredFile(input) {
       const file = input.files[0];
       if (!file) return;
       document.getElementById("uploadRawText").value = await file.text();
-      toast(`已读取 ${file.name}，点下方按钮即可自动导入`);
+      toast(`已读取 ${file.name}`);
       input.value = "";
     }
 
     async function submitSmartImport(mode) {
-      const isUpload = mode === "upload";
-      const raw = document.getElementById(isUpload ? "uploadRawText" : "apiKeyRawText").value.trim();
-      const name = document.getElementById(isUpload ? "uploadName" : "apiKeyName").value.trim();
-      const base_url = isUpload ? "" : document.getElementById("apiKeyBaseUrl").value.trim();
-      const tier = isUpload ? "" : document.getElementById("apiKeyTier").value.trim();
-      const btn = document.getElementById(isUpload ? "uploadSubmitBtn" : "apiKeySubmitBtn");
-      if (!raw) { toast("请先粘贴凭证或选择文件"); return; }
-      btn.disabled = true; btn.textContent = "自动识别并测速中...";
+      let raw = "", name = "", base_url = "", tier = "", btn = null;
+      if (mode === "upload") {
+        raw = document.getElementById("uploadRawText").value.trim();
+        name = document.getElementById("uploadName").value.trim();
+        btn = document.getElementById("uploadSubmitBtn");
+      } else if (mode === "gemini") {
+        raw = document.getElementById("gemKeys").value.trim();
+        name = document.getElementById("gemName").value.trim();
+        tier = document.getElementById("gemTier").value.trim();
+        btn = document.getElementById("gemSubmitBtn");
+      } else {
+        base_url = document.getElementById("compatUrl").value.trim();
+        raw = (base_url + "\n" + document.getElementById("compatKeys").value.trim()).trim();
+        name = document.getElementById("compatName").value.trim();
+        tier = document.getElementById("compatTier").value.trim();
+        btn = document.getElementById("compatSubmitBtn");
+      }
+      if (!raw) { toast("请先填入凭证内容"); return; }
+      const origText = btn.textContent;
+      btn.disabled = true; btn.textContent = "识别并接入中...";
       try {
         const res = await api("/api/smart-import", { method: "POST", body: JSON.stringify({ raw_text: raw, name, base_url, tier }) });
-        toast(`已自动接入 ${res.channels.length} 个账号`);
+        toast(`已接入 ${res.channels.length} 个账号`);
         closeAddModal();
         await Promise.all([loadChannels(), loadStats()]);
       } catch (e) { toast(e.message); }
-      finally { btn.disabled = false; btn.textContent = "自动识别并接入"; }
+      finally { btn.disabled = false; btn.textContent = origText; }
     }
 
-    /* ---------- Edit Modal ---------- */
+    /* ---------- 编辑弹窗 ---------- */
     function openEditModal(id) {
       const ch = channelsCache.find(c => c.id === id);
       if (!ch) return;
@@ -1151,11 +1484,9 @@
       document.getElementById("editQuotaUsed").value = ch.quota_used || 0;
       document.getElementById("editQuotaCycle").value = ch.quota_cycle || "none";
       document.getElementById("editPriority").value = ch.priority;
-      document.getElementById("editFetchedBox").style.display = "none";
 
       const p = providers.find(x => x.provider_type === ch.provider_type);
-      const box = document.getElementById("editDynamicFields");
-      box.innerHTML = p ? p.fields.map(f => {
+      document.getElementById("editDynamicFields").innerHTML = p ? p.fields.map(f => {
         const val = (ch.config || {})[f.key] || "";
         const inputEl = f.type === "textarea"
           ? `<textarea data-edit-key="${f.key}">${escapeHtml(val)}</textarea>`
@@ -1164,51 +1495,13 @@
       }).join("") : "";
       document.getElementById("editModal").classList.add("show");
     }
-
     function closeEditModal() { document.getElementById("editModal").classList.remove("show"); }
 
-    function collectEditConfig() {
+    async function saveEditedChannel() {
       const id = parseInt(document.getElementById("editChannelId").value, 10);
       const ch = channelsCache.find(c => c.id === id);
       const cfg = Object.assign({}, ch ? ch.config : {});
       document.querySelectorAll("[data-edit-key]").forEach(el => { cfg[el.getAttribute("data-edit-key")] = el.value.trim(); });
-      return cfg;
-    }
-
-    async function fetchModelsInEdit() {
-      const btn = document.getElementById("editFetchBtn");
-      btn.disabled = true; btn.textContent = "拉取中...";
-      try {
-        const res = await api("/api/providers/fetch-models", {
-          method: "POST",
-          body: JSON.stringify({ provider_type: document.getElementById("editChannelType").value, config: collectEditConfig() })
-        });
-        editFetchedModels = res.models || [];
-        renderEditModels();
-        toast(`拉取到 ${editFetchedModels.length} 个模型`);
-      } catch (e) { toast(e.message); }
-      finally { btn.disabled = false; btn.textContent = "拉取模型"; }
-    }
-
-    function renderEditModels() {
-      const box = document.getElementById("editFetchedBox");
-      const current = new Set(document.getElementById("editModels").value.split(",").map(s => s.trim()).filter(Boolean));
-      box.style.display = "block";
-      box.innerHTML = `<div class="model-chips">
-        ${editFetchedModels.map(m => `<button type="button" class="model-chip ${current.has(m) ? 'selected' : ''}" onclick="toggleEditModel('${escapeHtml(m)}')">${escapeHtml(m)}</button>`).join("")}
-      </div>`;
-    }
-
-    function toggleEditModel(m) {
-      const current = document.getElementById("editModels").value.split(",").map(s => s.trim()).filter(Boolean);
-      const idx = current.indexOf(m);
-      if (idx >= 0) current.splice(idx, 1); else current.push(m);
-      document.getElementById("editModels").value = current.join(",");
-      renderEditModels();
-    }
-
-    async function saveEditedChannel() {
-      const id = document.getElementById("editChannelId").value;
       const payload = {
         name: document.getElementById("editName").value.trim(),
         tier: document.getElementById("editTier").value.trim(),
@@ -1219,7 +1512,7 @@
         quota_used: parseInt(document.getElementById("editQuotaUsed").value || "0", 10),
         quota_cycle: document.getElementById("editQuotaCycle").value,
         enabled: true,
-        config: collectEditConfig(),
+        config: cfg,
       };
       try {
         await api(`/api/channels/${id}`, { method: "PUT", body: JSON.stringify(payload) });
@@ -1229,7 +1522,7 @@
       } catch (e) { toast(e.message); }
     }
 
-    /* ---------- Actions ---------- */
+    /* ---------- 常规操作 ---------- */
     async function calibrateQuota(id, used, limit) {
       const val = prompt(`输入当前已用次数（上限 ${limit}）：`, String(used));
       if (val === null) return;
@@ -1243,7 +1536,7 @@
     async function toggleChannel(id, enabled) {
       try {
         await api(`/api/channels/${id}/toggle`, { method: "PATCH", body: JSON.stringify({ enabled }) });
-        toast(enabled ? "已开启账号" : "已关闭账号");
+        toast(enabled ? "已开启" : "已关闭");
         loadStats();
       } catch (e) { toast(e.message); }
     }
@@ -1293,21 +1586,13 @@
       const data = await api(`/api/logs?limit=80&only_errors=${onlyErrors}`);
       const logs = data.logs || [];
       const box = document.getElementById("logsList");
-      if (!logs.length) {
-        box.innerHTML = `<div class="muted" style="text-align:center;padding:18px 0;">暂无请求记录</div>`;
-        return;
-      }
+      if (!logs.length) { box.innerHTML = `<div class="muted" style="text-align:center;padding:18px 0;">暂无请求记录</div>`; return; }
       box.innerHTML = logs.map(l => {
         const badge = l.success ? `<span class="badge badge-ok">${ICONS.check}${l.status_code}</span>` : `<span class="badge badge-err">${ICONS.alert}${l.status_code}</span>`;
         const err = l.error_detail ? `<div class="err-box">${escapeHtml(l.error_detail)}</div>` : "";
         return `<div class="list-row">
-          <div class="row">
-            <div><strong style="font-size:13.5px;">${escapeHtml(l.model)}</strong> <span class="muted">· ${escapeHtml(l.channel_name)}</span></div>
-            ${badge}
-          </div>
-          <div class="muted" style="margin-top:5px;">
-            ${l.created_at} UTC · ${l.latency_ms}ms · ${l.total_tokens} tok（入 ${l.prompt_tokens} / 出 ${l.completion_tokens}）
-          </div>
+          <div class="row"><div><strong style="font-size:13.5px;">${escapeHtml(l.model)}</strong> <span class="muted">· ${escapeHtml(l.channel_name)}</span></div>${badge}</div>
+          <div class="muted" style="margin-top:5px;">${l.created_at} UTC · ${l.latency_ms}ms · ${l.total_tokens} tok（入 ${l.prompt_tokens} / 出 ${l.completion_tokens}）</div>
           ${err}
         </div>`;
       }).join("");
@@ -1322,16 +1607,14 @@
 
     async function toggleFailover(enabled) {
       await api("/api/settings/failover", { method: "POST", body: JSON.stringify({ enabled }) });
-      toast(enabled ? "已开启自动切换备用账号" : "已关闭自动切换");
+      toast(enabled ? "已开启自动切换" : "已关闭自动切换");
     }
 
     async function rotateProxyKey() {
       if (!confirm("确定重新生成对外总密钥？旧密钥会立即失效。")) return;
       const res = await api("/api/settings/rotate-proxy-key", { method: "POST" });
-      currentProxyKey = res.proxy_api_key;
-      showFullKey = true;
-      renderProxyKey();
-      toast("已生成新密钥，请同步更新前端");
+      currentProxyKey = res.proxy_api_key; showFullKey = true; renderProxyKey();
+      toast("已生成新密钥");
     }
 
     async function exportBackup() {
@@ -1340,13 +1623,11 @@
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = `77api-backup-${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      toast("已导出备份文件");
+      a.click(); toast("已导出备份");
     }
 
     async function importBackup(input) {
-      const file = input.files[0];
-      if (!file) return;
+      const file = input.files[0]; if (!file) return;
       try {
         const parsed = JSON.parse(await file.text());
         const res = await api("/api/backup/import", { method: "POST", body: JSON.stringify({ channels: parsed.channels || [], replace: false }) });
@@ -1361,8 +1642,7 @@
       const new_password = document.getElementById("newPwd").value;
       try {
         await api("/api/settings/password", { method: "POST", body: JSON.stringify({ old_password, new_password }) });
-        toast("密码已修改，请重新登录");
-        logout();
+        toast("密码已修改，请重新登录"); logout();
       } catch (e) { toast(e.message); }
     }
 
