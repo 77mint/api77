@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import httpx
 import re
 import secrets
 import time
@@ -345,6 +346,74 @@ async def api_kiro_device_poll(req: KiroDevicePollReq):
     }
     ch = await _create_kiro_channel_auto(cfg, req.name or "Kiro-BuilderID")
     return {"status": "ok", "channel": ch}
+
+
+class QuickOAuthStartReq(BaseModel):
+    fresh: bool = False
+
+
+class QuickOAuthSubmitReq(BaseModel):
+    session_id: str
+    callback_url: str
+    name: str = ""
+
+
+def _quick_bridge_base() -> str:
+    return os.environ.get("QUICK_BRIDGE_URL", "http://quick-bridge:3426").strip().rstrip("/")
+
+
+@app.post("/api/oauth/quick/start", dependencies=[Depends(require_admin)])
+async def api_quick_oauth_start(req: QuickOAuthStartReq):
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            resp = await client.post(f"{_quick_bridge_base()}/oauth/start", json={"fresh": req.fresh})
+        data = resp.json()
+        if resp.status_code != 200:
+            raise HTTPException(status_code=400, detail=data.get("detail") or f"Quick 启动授权失败 ({resp.status_code})")
+        return data
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"无法连接 quick-bridge 服务: {exc}")
+
+
+@app.post("/api/oauth/quick/submit", dependencies=[Depends(require_admin)])
+async def api_quick_oauth_submit(req: QuickOAuthSubmitReq):
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                f"{_quick_bridge_base()}/oauth/submit",
+                json={"session_id": req.session_id, "callback_url": req.callback_url},
+            )
+        data = resp.json()
+        if resp.status_code != 200:
+            raise HTTPException(status_code=400, detail=data.get("detail") or f"Quick 授权失败 ({resp.status_code})")
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"无法连接 quick-bridge 服务: {exc}")
+
+    if data.get("status") == "hop2":
+        return data
+
+    account_key = data.get("account_key") or ""
+    email = data.get("email") or ""
+    display = data.get("display_name") or ""
+    usage = data.get("usage") or {}
+    plan = str(usage.get("plan") or usage.get("label") or "Free").strip()
+    tier = "Plus" if "plus" in plan.lower() or "pro" in plan.lower() else "Free"
+    ch_name = req.name.strip() or (f"Quick-{email.split('@')[0]}" if email else (f"Quick-{display}" if display else f"Quick-{account_key[-4:]}"))
+    cid = db.create_channel(
+        name=ch_name,
+        provider_type="aws_quick",
+        config={"account_key": account_key},
+        models="smart,fast,balanced,advanced",
+        enabled=True,
+        priority=10,
+        tier=tier,
+    )
+    db.update_channel_health(cid, "ok", 0, "")
+    return {"status": "ok", "channel": db.get_channel(cid)}
 
 
 @app.post("/api/smart-import", dependencies=[Depends(require_admin)])
