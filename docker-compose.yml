@@ -5,11 +5,27 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    environment:
+      - HUB_ADMIN_PASSWORD=${HUB_ADMIN_PASSWORD:-Mint77Hub#2026}
+      - QUICK_BRIDGE_URL=http://quick-bridge:3426
     volumes:
       - ./data:/app/data
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    depends_on:
+      - quick-bridge
+
+  quick-bridge:
+    image: node:22-alpine
+    container_name: quick-bridge
+    restart: unless-stopped
+    command: ["node", "/app/quick_bridge.mjs"]
     environment:
-      - DATA_DIR=/app/data
-      # 首次启动时的默认面板密码（启动后可在网页「设置」里修改）
-      - ADMIN_PASSWORD=change_me_123456
+      - PORT=3426
+      - HOST=0.0.0.0
+      - UPSTREAM_DIR=/app/upstream
+      - QUICK_DATA_DIR=/data
+    volumes:
+      - ../magpie-aws-quick:/app/upstream:ro
+      - ./quick_bridge.mjs:/app/quick_bridge.mjs:ro
+      - ./quick-data:/data
