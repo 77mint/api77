@@ -184,7 +184,7 @@
       position: absolute;
       inset: 0;
       border-radius: 18px;
-      background: var(--f-back, #161618);
+      background: #111113;
     }
     .folder-tab {
       position: absolute;
@@ -193,17 +193,17 @@
       width: 44%;
       height: 22%;
       border-radius: 14px 16px 0 0;
-      background: var(--f-back, #161618);
+      background: #111113;
     }
     .folder-back-body {
       position: absolute;
       top: 12%;
       left: 0; right: 0; bottom: 0;
       border-radius: 0 16px 18px 18px;
-      background: var(--f-back, #161618);
+      background: #111113;
     }
 
-    /* 夹在中间的三张白纸 */
+    /* 夹在中间的三张白纸（向下延伸，透过微透黑色前袋若隐若现） */
     .folder-paper {
       position: absolute;
       background: #ffffff;
@@ -213,15 +213,15 @@
       transition: transform 0.25s var(--ease-ios);
     }
     .folder-paper-left {
-      left: 8%; top: 20%; width: 48%; height: 52%;
+      left: 8%; top: 20%; width: 48%; height: 68%;
       transform: rotate(-3deg);
     }
     .folder-paper-right {
-      right: 8%; top: 24%; width: 44%; height: 48%;
+      right: 8%; top: 24%; width: 44%; height: 64%;
       transform: rotate(3deg);
     }
     .folder-paper-mid {
-      left: 28%; top: 7%; width: 46%; height: 60%;
+      left: 28%; top: 7%; width: 46%; height: 76%;
       transform: rotate(6deg);
       z-index: 2;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
@@ -231,17 +231,23 @@
     }
     .paper-line.short { width: 65%; }
 
-    /* 前口袋（立体渐变 + 顶部高光 + 底部压纹细线 + 右下角品牌图标） */
+    /* 前口袋（统一烟熏黑 + 微透磨砂质感 + 顶部高光 + 底部压纹细线） */
     .folder-front {
       position: absolute;
       left: 0; right: 0; bottom: 0;
       height: 58%;
       z-index: 3;
       border-radius: 16px 16px 18px 18px;
-      background: linear-gradient(155deg, var(--f-front-hi, #3a3a3e) 0%, var(--f-front, #1e1e21) 52%, var(--f-front-lo, #121214) 100%);
+      background: linear-gradient(
+        160deg,
+        rgba(56, 56, 62, 0.72) 0%,
+        rgba(24, 24, 28, 0.80) 48%,
+        rgba(12, 12, 15, 0.88) 100%
+      );
+      border: 0.5px solid rgba(255, 255, 255, 0.16);
       box-shadow:
-        inset 0 1.5px 1px rgba(255, 255, 255, 0.34),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.28);
+        inset 0 1.5px 1.5px rgba(255, 255, 255, 0.30),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.42);
       overflow: hidden;
     }
     .folder-front::after {
@@ -249,31 +255,34 @@
       position: absolute;
       left: 12%; right: 12%; bottom: 13px;
       height: 1.5px;
-      background: rgba(255, 255, 255, 0.10);
-      box-shadow: 0 5px 0 rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.09);
+      box-shadow: 0 5px 0 rgba(255, 255, 255, 0.06);
       border-radius: 99px;
     }
 
-    /* 右下角专属品牌图标徽章 */
+    /* 右下角官方彩色品牌图标（无外框，直接悬浮） */
     .folder-brand-icon {
       position: absolute;
-      right: 11px;
+      right: 12px;
       bottom: 10px;
       z-index: 4;
-      width: 28px;
-      height: 28px;
-      border-radius: 9px;
-      background: rgba(255, 255, 255, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.36);
+      width: 24px;
+      height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #ffffff;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45);
+      pointer-events: none;
     }
+    .folder-brand-icon img,
     .folder-brand-icon svg {
-      width: 16px;
-      height: 16px;
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.45));
+    }
+    .folder-brand-icon img.brand-invert {
+      filter: brightness(0) invert(1) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.45));
     }
 
     .folder-label {
@@ -397,7 +406,7 @@
       stroke-width: 2.15;
     }
 
-    /* 中间加号上传按钮 */
+    /* 中间加号上传按钮（白色圆心） */
     .liquid-plus {
       position: relative;
       z-index: 3;
@@ -405,14 +414,17 @@
       height: 42px;
       margin: 0 auto;
       border-radius: 50%;
-      background: #111111;
-      color: #ffffff;
-      border: none;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.88) 100%);
+      color: #111111;
+      border: 1px solid rgba(255, 255, 255, 1);
       padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.22);
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.10),
+        inset 0 1.5px 1px rgba(255, 255, 255, 1),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.05);
       transition: transform 0.18s var(--ease-ios);
     }
     .liquid-plus:active { transform: scale(0.88); }
@@ -676,10 +688,6 @@
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-header"><div class="card-title">各账号调用统计</div></div>
-          <div id="channelStatsList" class="muted">暂无调用记录</div>
-        </div>
       </section>
 
       <!-- 2. 渠道（文件夹网格 + 点击进入二级账号详情页） -->
@@ -928,13 +936,11 @@
 
       <div class="accordion">
         <button class="accordion-head" type="button" onclick="this.parentElement.classList.toggle('open')">
-          <span>高级设置（模型限定 / 额度 / 优先级）</span>
+          <span>高级设置（额度 / 优先级）</span>
           <svg class="icon icon-sm accordion-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div class="accordion-body">
           <div class="accordion-inner">
-            <label class="field-label">限定模型（留空表示全部通配）</label>
-            <input id="editModels" type="text" placeholder="留空即可" />
             <div class="grid-2">
               <div><label class="field-label">额度上限</label><input id="editQuotaLimit" type="number" min="0" value="0" /></div>
               <div><label class="field-label">已用次数</label><input id="editQuotaUsed" type="number" min="0" value="0" /></div>
@@ -967,33 +973,43 @@
     let deviceSessionId = "";
     let devicePollTimer = null;
 
-    // 高级低饱和文件袋随机配色池（黑、深雾蓝、鼠尾草、暖石棕、烟熏紫、深松绿）
-    const FOLDER_PALETTES = [
-      { back: "#161618", hi: "#3c3c40", front: "#212124", lo: "#121214" },
-      { back: "#243447", hi: "#47607c", front: "#2f435a", lo: "#1c2938" },
-      { back: "#2b3d34", hi: "#4e6b5c", front: "#364c41", lo: "#202e27" },
-      { back: "#3c3532", hi: "#625853", front: "#4b433f", lo: "#2d2825" },
-      { back: "#353145", hi: "#595270", front: "#433e56", lo: "#272434" },
-      { back: "#2d3740", hi: "#51616f", front: "#394652", lo: "#222a31" }
-    ];
-    const folderColorMap = {};
-    function getFolderPalette(key) {
-      if (!folderColorMap[key]) {
-        folderColorMap[key] = FOLDER_PALETTES[Math.floor(Math.random() * FOLDER_PALETTES.length)];
+    // 官方彩色品牌图标（直接引用 Lobe Icons 官方矢量库 + 双 CDN 自动兜底）
+    function getBrandIconHtml(ptype, hint = "") {
+      const m = (ptype + " " + hint).toLowerCase();
+      let slug = "openai";
+      let invert = true;
+      if (m.includes("kiro")) {
+        slug = "kiro-color";
+        invert = false;
+      } else if (m.includes("claude") || m.includes("anthropic")) {
+        slug = "claude-color";
+        invert = false;
+      } else if (m.includes("gemini") || m.includes("google")) {
+        slug = "gemini-color";
+        invert = false;
+      } else if (m.includes("deepseek")) {
+        slug = "deepseek-color";
+        invert = false;
+      } else if (m.includes("grok") || m.includes("xai")) {
+        slug = "grok";
+        invert = true;
+      } else if (m.includes("kimi") || m.includes("moonshot")) {
+        slug = "kimi-color";
+        invert = false;
+      } else if (m.includes("qwen")) {
+        slug = "qwen-color";
+        invert = false;
+      } else if (m.includes("nvidia")) {
+        slug = "nvidia-color";
+        invert = false;
+      } else if (m.includes("openrouter")) {
+        slug = "openrouter";
+        invert = true;
       }
-      return folderColorMap[key];
-    }
-
-    // 精准品牌矢量图标：Gemini 四角星 / Claude 放射星芒 / OpenAI 节点
-    function getBrandSvg(ptype, models = "") {
-      const m = (ptype + " " + models).toLowerCase();
-      if (m.includes("gemini")) {
-        return '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C12.8 7.4 16.6 11.2 22 12C16.6 12.8 12.8 16.6 12 22C11.2 16.6 7.4 12.8 2 12C7.4 11.2 11.2 7.4 12 2Z"/></svg>';
-      }
-      if (m.includes("kiro") || m.includes("claude")) {
-        return '<svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.1" stroke-linecap="round"><line x1="12" y1="2.5" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="21.5" y2="12"/><line x1="5.3" y1="5.3" x2="18.7" y2="18.7"/><line x1="18.7" y1="5.3" x2="5.3" y2="18.7"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/></svg>';
-      }
-      return '<svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>';
+      const primary = `https://unpkg.com/@lobehub/icons-static-svg@latest/icons/${slug}.svg`;
+      const backup = `https://cdn.jsdelivr.net/npm/@lobehub/icons-static-svg@latest/icons/${slug}.svg`;
+      const cls = invert ? 'class="brand-invert"' : "";
+      return `<img ${cls} src="${primary}" alt="${slug}" loading="lazy" onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='${backup}';}" />`;
     }
 
     const ICONS = {
@@ -1177,17 +1193,6 @@
       document.getElementById("st-channels").textContent = `${s.channel_enabled} / ${s.channel_total}`;
       document.getElementById("failoverSwitch").checked = !!s.auto_failover;
       renderProxyKey();
-
-      const list = s.by_channel || [];
-      document.getElementById("channelStatsList").innerHTML = list.length
-        ? list.map(c => {
-            const rate = c.requests ? Math.round((c.successes / c.requests) * 100) : 100;
-            return `<div class="list-row row">
-              <div><strong style="font-size:13.5px;">${escapeHtml(c.channel_name)}</strong> <span class="muted">${c.requests} 次</span></div>
-              <div class="muted">${rate}% 成功 · ${c.tokens} tok · ${c.avg_latency_ms}ms</div>
-            </div>`;
-          }).join("")
-        : "暂无调用记录";
     }
 
     /* ---------- 渠道文件夹网格 + 二级详情 ---------- */
@@ -1226,19 +1231,18 @@
       }
 
       grid.innerHTML = Object.entries(groups).map(([ptype, g]) => {
-        const pal = getFolderPalette(ptype);
         const enabledCount = g.items.filter(x => x.enabled).length;
-        const allModels = g.items.map(x => x.models || "").join(" ");
-        const brandSvg = getBrandSvg(ptype, allModels);
+        const hint = g.items.map(x => x.name || "").join(" ");
+        const brandIcon = getBrandIconHtml(ptype, hint);
         return `<div class="folder-item" onclick="openFolderDetail('${ptype}')">
-          <div class="folder-shell" style="--f-back:${pal.back};--f-front-hi:${pal.hi};--f-front:${pal.front};--f-front-lo:${pal.lo};">
+          <div class="folder-shell">
             <div class="folder-tab"></div>
             <div class="folder-back-body"></div>
             <div class="folder-paper folder-paper-left"><div class="paper-line"></div><div class="paper-line short"></div></div>
             <div class="folder-paper folder-paper-right"><div class="paper-line"></div></div>
             <div class="folder-paper folder-paper-mid"><div class="paper-line"></div><div class="paper-line"></div><div class="paper-line short"></div></div>
             <div class="folder-front">
-              <div class="folder-brand-icon">${brandSvg}</div>
+              <div class="folder-brand-icon">${brandIcon}</div>
             </div>
           </div>
           <div class="folder-label">${escapeHtml(g.label)}</div>
@@ -1479,7 +1483,6 @@
       document.getElementById("editChannelType").value = ch.provider_type;
       document.getElementById("editName").value = ch.name;
       document.getElementById("editTier").value = ch.tier || "";
-      document.getElementById("editModels").value = ch.models || "";
       document.getElementById("editQuotaLimit").value = ch.quota_limit || 0;
       document.getElementById("editQuotaUsed").value = ch.quota_used || 0;
       document.getElementById("editQuotaCycle").value = ch.quota_cycle || "none";
@@ -1506,7 +1509,7 @@
         name: document.getElementById("editName").value.trim(),
         tier: document.getElementById("editTier").value.trim(),
         provider_type: document.getElementById("editChannelType").value,
-        models: document.getElementById("editModels").value.trim(),
+        models: ch ? (ch.models || "") : "",
         priority: parseInt(document.getElementById("editPriority").value || "10", 10),
         quota_limit: parseInt(document.getElementById("editQuotaLimit").value || "0", 10),
         quota_used: parseInt(document.getElementById("editQuotaUsed").value || "0", 10),
@@ -1558,7 +1561,7 @@
         const box = document.getElementById(`ch-reply-${id}`);
         if (res.ok) {
           toast(`回复成功 (${res.latency_ms}ms)`);
-          if (box) box.innerHTML = `<div class="reply-box"><strong>${escapeHtml(res.model)}</strong> (${res.latency_ms}ms)：${escapeHtml(res.reply)}</div>`;
+          if (box) box.innerHTML = `<div class="reply-box"><strong>试聊通过</strong> (${res.latency_ms}ms)：${escapeHtml(res.reply)}</div>`;
         } else {
           toast("试聊失败");
           if (box) box.innerHTML = `<div class="err-box">${escapeHtml(res.error)}</div>`;
@@ -1591,7 +1594,7 @@
         const badge = l.success ? `<span class="badge badge-ok">${ICONS.check}${l.status_code}</span>` : `<span class="badge badge-err">${ICONS.alert}${l.status_code}</span>`;
         const err = l.error_detail ? `<div class="err-box">${escapeHtml(l.error_detail)}</div>` : "";
         return `<div class="list-row">
-          <div class="row"><div><strong style="font-size:13.5px;">${escapeHtml(l.model)}</strong> <span class="muted">· ${escapeHtml(l.channel_name)}</span></div>${badge}</div>
+          <div class="row"><div><strong style="font-size:13.5px;">${escapeHtml(l.channel_name || "默认渠道")}</strong></div>${badge}</div>
           <div class="muted" style="margin-top:5px;">${l.created_at} UTC · ${l.latency_ms}ms · ${l.total_tokens} tok（入 ${l.prompt_tokens} / 出 ${l.completion_tokens}）</div>
           ${err}
         </div>`;
