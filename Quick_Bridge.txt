@@ -1,0 +1,244 @@
+// 77api <-> magpie-aws-quick internal bridge (Node >= 22, zero dependencies)
+// Runs upstream magpie-aws-quick OAuth, WS protocol, 3-level thread reuse & usage APIs.
+import { createServer } from 'node:http'
+import { randomBytes } from 'node:crypto'
+import { mkdirSync } from 'node:fs'
+import path from 'node:path'
+
+const UPSTREAM = process.env.UPSTREAM_DIR || '/app/upstream'
+const DATA_DIR = process.env.QUICK_DATA_DIR || '/data'
+const PORT = Number(process.env.PORT || 3426)
+const HOST = process.env.HOST || '0.0.0.0'
+
+mkdirSync(DATA_DIR, { recursive: true })
+
+const { handleChatCompletions, handleModels } = await import(path.join(UPSTREAM, 'lib/handler.mjs'))
+const { createSessionStore: createThreadStore, SESSION_DEFAULTS } = await import(path.join(UPSTREAM, 'lib/sessions.mjs'))
+const {
+  createSessionStore: createOAuthStore,
+  createDirectBackend,
+  startOAuthLogin,
+  takeDiscovery,
+  keyForSession,
+  OAuthError,
+} = await import(path.join(UPSTREAM, 'lib/oauth.mjs'))
+const { quickUsage } = await import(path.join(UPSTREAM, 'lib/usage.mjs'))
+
+const oauthStore = createOAuthStore({ dir: DATA_DIR })
+const threadSessions = createThreadStore({
+  ttlMs: SESSION_DEFAULTS.ttlMs,
+  max: SESSION_DEFAULTS.max,
+  file: path.join(DATA_DIR, 'thread-sessions.json'),
+})
+
+// Pending browser OAuth sessions: sid -> { url, submit, cancel, createdAt }
+const pendingAuth = new Map()
+const backendCache = new Map()
+
+function cleanupPending() {
+  const now = Date.now()
+  for (const [sid, p] of pendingAuth.entries()) {
+    if (now - p.createdAt > 12 * 60 * 1000) {
+      try { p.cancel?.() } catch {}
+      pendingAuth.delete(sid)
+    }
+  }
+}
+
+function getBackendFor(accountKey) {
+  let key = accountKey
+  if (!key) {
+    const keys = oauthStore.list()
+    if (!keys.length) return null
+    key = keys[0]
+  }
+  if (!oauthStore.get(key)) return null
+  if (!backendCache.has(key)) {
+    const backend = createDirectBackend({
+      load: () => oauthStore.get(key),
+      persist: (s) => oauthStore.set(key, s),
+      log: (line) => console.log(`[quick:${key}] ${line}`),
+    })
+    backendCache.set(key, {
+      key,
+      backend,
+      mgr: { ensure: () => backend.ensure() },
+    })
+  }
+  return backendCache.get(key)
+}
+
+async function readJson(req) {
+  let raw = ''
+  for await (const chunk of req) raw += chunk
+  return raw ? JSON.parse(raw) : {}
+}
+
+function sendJson(res, status, obj) {
+  const data = Buffer.from(JSON.stringify(obj))
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': data.length })
+  res.end(data)
+}
+
+async function pipeWebResponse(res, webResp) {
+  const headers = {}
+  webResp.headers.forEach((v, k) => { headers[k] = v })
+  res.writeHead(webResp.status, headers)
+  if (!webResp.body) {
+    res.end()
+    return
+  }
+  const reader = webResp.body.getReader()
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      res.write(Buffer.from(value))
+    }
+  } finally {
+    res.end()
+  }
+}
+
+const server = createServer(async (req, res) => {
+  try {
+    const u = new URL(req.url, `http://127.0.0.1:${PORT}`)
+    const pathname = u.pathname.replace(/\/+$/, '') || '/'
+
+    if (req.method === 'GET' && pathname === '/health') {
+      return sendJson(res, 200, { ok: true, accounts: oauthStore.list() })
+    }
+
+    // 1. Start OAuth (supports automatic Hop-1 or Hop-2 if discovery exists)
+    if (req.method === 'POST' && pathname === '/oauth/start') {
+      cleanupPending()
+      const body = await readJson(req).catch(() => ({}))
+      const discovery = body.fresh ? null : takeDiscovery(DATA_DIR)
+      const started = await startOAuthLogin({
+        stage: 'prod',
+        discovery: discovery || undefined,
+        dir: DATA_DIR,
+        log: (line) => console.log(line),
+      })
+      const sid = randomBytes(12).toString('hex')
+      pendingAuth.set(sid, { ...started, createdAt: Date.now() })
+      return sendJson(res, 200, {
+        ok: true,
+        session_id: sid,
+        auth_url: started.url,
+        step: discovery ? 2 : 1,
+      })
+    }
+
+    // 2. Submit pasted callback URL (auto-chains Hop-1 -> Hop-2 seamlessly!)
+    if (req.method === 'POST' && pathname === '/oauth/submit') {
+      const body = await readJson(req).catch(() => ({}))
+      const sid = String(body.session_id || '')
+      const pasted = String(body.callback_url || '').trim()
+      const entry = pendingAuth.get(sid)
+      if (!entry) return sendJson(res, 400, { detail: '授权会话已过期，请重新点击生成登录链接' })
+      if (!pasted) return sendJson(res, 400, { detail: '请先粘贴浏览器跳转后的完整网址' })
+
+      try {
+        const sess = await entry.submit(pasted)
+        try { entry.cancel?.() } catch {}
+        pendingAuth.delete(sid)
+
+        const accountKey = keyForSession(sess)
+        oauthStore.set(accountKey, sess)
+        backendCache.delete(accountKey)
+
+        let usage = null
+        try {
+          const b = getBackendFor(accountKey)
+          if (b) usage = await quickUsage(async () => (await b.mgr.ensure()).session(), {})
+        } catch {}
+
+        return sendJson(res, 200, {
+          status: 'ok',
+          account_key: accountKey,
+          email: sess.email || '',
+          display_name: sess.display_name || sess.account_name || '',
+          usage,
+        })
+      } catch (e) {
+        if (e instanceof OAuthError && e.kind === 'discovery-saved') {
+          // Hop-1 completed! Immediately start Hop-2 and hand back the authorize URL
+          try { entry.cancel?.() } catch {}
+          pendingAuth.delete(sid)
+          const disc = takeDiscovery(DATA_DIR)
+          const nextStarted = await startOAuthLogin({
+            stage: 'prod',
+            discovery: disc || undefined,
+            dir: DATA_DIR,
+            log: (line) => console.log(line),
+          })
+          const nextSid = randomBytes(12).toString('hex')
+          pendingAuth.set(nextSid, { ...nextStarted, createdAt: Date.now() })
+          return sendJson(res, 200, {
+            status: 'hop2',
+            session_id: nextSid,
+            auth_url: nextStarted.url,
+            message: '第一步已完成！请打开下方第二步授权链接确认登录，再把跳转后的地址粘贴回来。',
+          })
+        }
+        return sendJson(res, 400, { detail: String(e?.message ?? e) })
+      }
+    }
+
+    // 3. Account usage / health check
+    if (req.method === 'GET' && pathname.startsWith('/usage/')) {
+      const accountKey = decodeURIComponent(pathname.slice('/usage/'.length))
+      const b = getBackendFor(accountKey)
+      if (!b) return sendJson(res, 404, { detail: '未找到该 Quick 账号登录态，请重新授权' })
+      try {
+        const sess = await (await b.mgr.ensure()).session()
+        let usage = null
+        try {
+          usage = await quickUsage(async () => sess, {})
+        } catch {}
+        return sendJson(res, 200, { ok: true, account_key: b.key, usage })
+      } catch (e) {
+        return sendJson(res, 401, { detail: String(e?.message ?? e) })
+      }
+    }
+
+    // 4. Models list
+    if (req.method === 'GET' && /\/models$/.test(pathname)) {
+      const out = handleModels()
+      return await pipeWebResponse(res, out)
+    }
+
+    // 5. OpenAI Chat Completions
+    if (req.method === 'POST' && /\/chat\/completions$/.test(pathname)) {
+      const accountKey = String(req.headers['x-quick-account'] || '').trim()
+      const b = getBackendFor(accountKey)
+      if (!b) {
+        return sendJson(res, 401, { error: { message: '未找到有效的 AWS Quick 登录态，请在 77api 重新授权' } })
+      }
+      const body = await readJson(req)
+      const ac = new AbortController()
+      res.on('close', () => { if (!res.writableEnded) ac.abort() })
+      const out = await handleChatCompletions({
+        body,
+        outpostMgr: b.mgr,
+        sessions: threadSessions,
+        options: {
+          identity: b.key,
+          sessionKey: req.headers['x-session-id'] || req.headers['x-conversation-id'] || undefined,
+        },
+        effortHeader: req.headers['x-magpie-effort'] || undefined,
+        signal: ac.signal,
+      })
+      return await pipeWebResponse(res, out)
+    }
+
+    return sendJson(res, 404, { error: { message: `not found: ${req.method} ${pathname}` } })
+  } catch (e) {
+    return sendJson(res, 500, { error: { message: String(e?.message ?? e) } })
+  }
+})
+
+server.listen(PORT, HOST, () => {
+  console.log(`[quick-bridge] listening on http://${HOST}:${PORT} (accounts: ${oauthStore.list().length})`)
+})
