@@ -588,8 +588,10 @@
 
     .toast {
       position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); left: 50%;
-      transform: translate(-50%, -10px); background: #111111; color: #ffffff;
-      padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 500;
+      transform: translate(-50%, -10px); background: rgba(17, 17, 17, 0.94); color: #ffffff;
+      padding: 10px 16px; border-radius: 16px; font-size: 13px; font-weight: 500;
+      max-width: min(336px, calc(100vw - 32px)); width: max-content;
+      line-height: 1.45; text-align: center; word-break: break-word;
       z-index: 99; opacity: 0; pointer-events: none; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
       transition: opacity 0.2s ease, transform 0.24s var(--ease-ios);
     }
@@ -881,10 +883,30 @@
         </div>
       </div>
 
+      <!-- AWS Quick 专属区（官方 OAuth，自动衔接第一步与第二步） -->
+      <div id="add-quick" style="display:none;">
+        <div class="step-box">
+          <div class="step-row"><span class="step-num">1</span><span>点下方按钮生成 Amazon Quick 登录链接，在手机浏览器完成登录。</span></div>
+          <div class="step-row"><span class="step-num">2</span><span>跳到「无法访问」页面后，完整复制地址栏网址粘贴回下方提交。</span></div>
+          <div class="step-row"><span class="step-num">3</span><span>首次登录会自动弹出第二步确认链接，再点一次授权粘回即可完成绑定。</span></div>
+        </div>
+        <button id="quickStartBtn" class="primary" style="width:100%;margin-bottom:10px;padding:11px;border-radius:14px;" onclick="startQuickOAuth(true)">生成 AWS Quick 登录链接</button>
+        <div id="quickAuthLinkBox" style="display:none;margin-bottom:10px;" class="endpoint-box">
+          <div class="endpoint-label" id="quickStepLabel">第一步：登录发现链接</div>
+          <div class="row">
+            <a id="quickAuthHref" href="#" target="_blank" style="font-size:13px;font-weight:600;color:#111111;">点击打开 Amazon Quick 登录页</a>
+            <button class="sm" onclick="copyWithFeedback(document.getElementById('quickAuthHref').href, this)">复制链接</button>
+          </div>
+        </div>
+        <textarea id="quickCallbackUrl" placeholder="粘贴跳转后的完整网址（即使提示无法访问也直接复制地址栏）"></textarea>
+        <input id="quickName" type="text" placeholder="备注名（可留空自动识别邮箱）" />
+        <button id="quickSubmitBtn" class="primary" style="width:100%;margin-top:12px;padding:12px;border-radius:14px;" onclick="submitQuickOAuth()">提交授权网址</button>
+      </div>
+
       <!-- Google AI Studio (Gemini) 专属区 -->
       <div id="add-gemini" style="display:none;">
-        <div class="step-box">粘贴 Google AI Studio 官方 <strong>AIza...</strong> 密钥（多把 Key 每行一把自动轮询），后台自动测速接入。</div>
-        <textarea id="gemKeys" placeholder="AIzaSy...（支持多行轮询）"></textarea>
+        <div class="step-box">粘贴 Google 官方 <strong>AIza...</strong> 或 Vertex Express <strong>AQ....</strong> 密钥（多把 Key 每行一把自动轮询），自动识别接入。</div>
+        <textarea id="gemKeys" placeholder="AIzaSy... 或 AQ....（支持多行轮询）"></textarea>
         <div class="grid-2">
           <input id="gemName" type="text" placeholder="备注名（可留空）" />
           <input id="gemTier" type="text" list="tierOptions" placeholder="Free / Pro（可选）" />
@@ -970,6 +992,7 @@
     let activeTabIdx = 0;
     let activeFolderType = null;
     let socialSessionId = "";
+    let quickSessionId = "";
     let deviceSessionId = "";
     let devicePollTimer = null;
 
@@ -980,6 +1003,9 @@
       let invert = true;
       if (m.includes("kiro")) {
         slug = "kiro-color";
+        invert = false;
+      } else if (m.includes("aws_quick") || m.includes("quick")) {
+        slug = "aws-color";
         invert = false;
       } else if (m.includes("claude") || m.includes("anthropic")) {
         slug = "claude-color";
@@ -1198,6 +1224,7 @@
     /* ---------- 渠道文件夹网格 + 二级详情 ---------- */
     function shortProviderName(ptype, fallback) {
       if (ptype === "kiro_native") return "Kiro";
+      if (ptype === "aws_quick") return "AWS Quick";
       if (ptype === "gemini_official") return "Gemini";
       if (ptype === "openai_compat") return "通用 /v1";
       return fallback || ptype;
@@ -1328,6 +1355,8 @@
       document.getElementById("socialAuthLinkBox").style.display = "none";
       document.getElementById("deviceCodeBox").style.display = "none";
       document.getElementById("socialCallbackUrl").value = "";
+      document.getElementById("quickAuthLinkBox").style.display = "none";
+      document.getElementById("quickCallbackUrl").value = "";
       document.getElementById("uploadRawText").value = "";
       document.getElementById("gemKeys").value = "";
       document.getElementById("compatUrl").value = "";
@@ -1360,8 +1389,9 @@
 
     function showAddPlatformPane(ptype) {
       document.getElementById("add-kiro").style.display = ptype === "kiro_native" ? "block" : "none";
+      document.getElementById("add-quick").style.display = ptype === "aws_quick" ? "block" : "none";
       document.getElementById("add-gemini").style.display = ptype === "gemini_official" ? "block" : "none";
-      document.getElementById("add-compat").style.display = (ptype !== "kiro_native" && ptype !== "gemini_official") ? "block" : "none";
+      document.getElementById("add-compat").style.display = (ptype !== "kiro_native" && ptype !== "aws_quick" && ptype !== "gemini_official") ? "block" : "none";
     }
 
     function switchKiroSub(sub, btn) {
@@ -1370,6 +1400,53 @@
       ["social", "device", "upload"].forEach(k => {
         document.getElementById("ksub-" + k).style.display = k === sub ? "block" : "none";
       });
+    }
+
+    async function startQuickOAuth(fresh = false) {
+      const btn = document.getElementById("quickStartBtn");
+      btn.disabled = true; btn.textContent = "生成链接中...";
+      try {
+        const res = await api("/api/oauth/quick/start", { method: "POST", body: JSON.stringify({ fresh }) });
+        quickSessionId = res.session_id;
+        document.getElementById("quickAuthHref").href = res.auth_url;
+        document.getElementById("quickStepLabel").textContent = res.step === 2 ? "第二步：点击下方最终授权链接" : "第一步：登录发现链接";
+        document.getElementById("quickAuthLinkBox").style.display = "block";
+        window.open(res.auth_url, "_blank");
+        toast("已生成链接，登录后复制完整网址粘回");
+      } catch (e) { toast(e.message); }
+      finally { btn.disabled = false; btn.textContent = "重新生成 AWS Quick 登录链接"; }
+    }
+
+    async function submitQuickOAuth() {
+      const url = document.getElementById("quickCallbackUrl").value.trim();
+      if (!quickSessionId) { toast("请先点击上方按钮生成登录链接"); return; }
+      if (!url) { toast("请先粘贴浏览器跳转后的完整网址"); return; }
+      const btn = document.getElementById("quickSubmitBtn");
+      btn.disabled = true; btn.textContent = "验证授权中...";
+      try {
+        const res = await api("/api/oauth/quick/submit", {
+          method: "POST",
+          body: JSON.stringify({
+            session_id: quickSessionId,
+            callback_url: url,
+            name: document.getElementById("quickName").value.trim()
+          })
+        });
+        if (res.status === "hop2") {
+          quickSessionId = res.session_id;
+          document.getElementById("quickAuthHref").href = res.auth_url;
+          document.getElementById("quickStepLabel").textContent = "第二步：打开最终授权链接并粘回新网址";
+          document.getElementById("quickAuthLinkBox").style.display = "block";
+          document.getElementById("quickCallbackUrl").value = "";
+          window.open(res.auth_url, "_blank");
+          toast("第一步已完成，请点第二步链接完成最终授权");
+          return;
+        }
+        toast(`已接入 ${res.channel.name}`);
+        closeAddModal();
+        await Promise.all([loadChannels(), loadStats()]);
+      } catch (e) { toast(e.message); }
+      finally { btn.disabled = false; btn.textContent = "提交授权网址"; }
     }
 
     async function startKiroSocial(idp, btn) {
