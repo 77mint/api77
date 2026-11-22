@@ -387,17 +387,19 @@ async def api_smart_import(req: SmartImportReq):
             raise HTTPException(status_code=400, detail="JSON 中未找到有效的 refreshToken 字段")
         return {"ok": True, "detected": "kiro_json", "channels": created}
 
-    # 2. 识别 Google AI Studio 官方 Key（AIza...）
+    # 2. 识别 Google AI Studio（AIza...）与 Vertex AI Express（AQ....）官方 Key
     aiza_keys = re.findall(r"AIza[0-9A-Za-z_\-]{20,}", raw)
-    if aiza_keys:
+    aq_keys = re.findall(r"AQ\.[0-9A-Za-z_\-\.]{16,}", raw)
+    gem_keys = list(dict.fromkeys(aiza_keys + aq_keys))
+    if gem_keys:
         gem = get_provider("gemini_official")
-        cfg = {"api_keys": "\n".join(dict.fromkeys(aiza_keys))}
+        cfg = {"api_keys": "\n".join(gem_keys)}
         t0 = time.perf_counter()
         ok, msg = await gem.test_connection(cfg)
         latency_ms = int((time.perf_counter() - t0) * 1000)
         models = await gem.list_models(cfg) if ok else []
         cid = db.create_channel(
-            name=req.name.strip() or f"Gemini-{aiza_keys[0][-4:]}",
+            name=req.name.strip() or f"Gemini-{gem_keys[0][-4:]}",
             provider_type="gemini_official",
             config=cfg,
             models=",".join(models),
@@ -443,7 +445,7 @@ async def api_smart_import(req: SmartImportReq):
 
     raise HTTPException(
         status_code=400,
-        detail="未能自动识别该内容：请粘贴 Kiro JSON、aorAAAAAG... Token、Google AIza... Key，或同时包含接口网址（https://...）与 API Key。",
+        detail="未能自动识别该内容：请粘贴 Kiro JSON、aorAAAAAG... Token、Google AIza... / AQ.... Key，或同时包含接口网址（https://...）与 API Key。",
     )
 
 
