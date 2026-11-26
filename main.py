@@ -1,12 +1,13 @@
 import hashlib
 import hmac
 import json
+import os
 import httpx
 import re
 import secrets
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, urlparse
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
@@ -759,17 +760,39 @@ def api_backup_import(req: BackupImportReq):
 
 
 # ---------- OpenAI-Compatible Proxy Endpoints ----------
-def _select_channels(model: str) -> List[Dict[str, Any]]:
+PROVIDER_PREFIX = {
+    "aws_quick": "quick",
+    "kiro_native": "kiro",
+    "gemini_official": "gemini",
+    "openai_compat": "v1",
+}
+PREFIX_TO_PROVIDER = {v: k for k, v in PROVIDER_PREFIX.items()}
+
+
+def _parse_prefixed_model(model: str) -> Tuple[Optional[str], str]:
+    """拆分 'quick/smart' -> ('aws_quick', 'smart')；无前缀保持原样以兼容旧客户端。"""
+    if "/" in model:
+        prefix, rest = model.split("/", 1)
+        ptype = PREFIX_TO_PROVIDER.get(prefix.strip().lower())
+        if ptype and rest.strip():
+            return ptype, rest.strip()
+    return None, model
+
+
+def _select_channels(model: str) -> Tuple[List[Dict[str, Any]], str]:
+    target_ptype, clean_model = _parse_prefixed_model(model)
     enabled = db.list_channels(only_enabled=True)
+    if target_ptype:
+        enabled = [ch for ch in enabled if ch["provider_type"] == target_ptype]
     exact: List[Dict[str, Any]] = []
     wildcard: List[Dict[str, Any]] = []
     for ch in enabled:
         mlist = ch["model_list"]
         if not mlist or "*" in mlist:
             wildcard.append(ch)
-        elif model in mlist:
+        elif clean_model in mlist or model in mlist:
             exact.append(ch)
-    return exact + wildcard
+    return exact + wildcard, clean_model
 
 
 @app.get("/v1/models", dependencies=[Depends(require_proxy_key)])
@@ -777,18 +800,23 @@ async def proxy_list_models():
     seen = set()
     data = []
     for ch in db.list_channels(only_enabled=True):
+        ptype = ch["provider_type"]
+        prefix = PROVIDER_PREFIX.get(ptype, ptype)
         models = ch["model_list"]
         if not models:
-            provider = get_provider(ch["provider_type"])
+            provider = get_provider(ptype)
             if provider:
                 try:
                     models = await provider.list_models(ch["config"])
                 except Exception:
                     models = []
         for m in models:
-            if m and m != "*" and m not in seen:
-                seen.add(m)
-                data.append({"id": m, "object": "model", "created": int(time.time()), "owned_by": ch["name"]})
+            if not m or m == "*":
+                continue
+            display_id = m if m.startswith(f"{prefix}/") else f"{prefix}/{m}"
+            if display_id not in seen:
+                seen.add(display_id)
+                data.append({"id": display_id, "object": "model", "created": int(time.time()), "owned_by": ch["name"]})
     return {"object": "list", "data": data}
 
 
@@ -802,13 +830,15 @@ async def proxy_chat_completions(request: Request):
     model = str(payload.get("model") or "").strip()
     is_stream = bool(payload.get("stream", False))
     auto_failover = db.get_setting("auto_failover", "1") == "1"
-    candidates = _select_channels(model)
+    candidates, clean_model = _select_channels(model)
 
     if not candidates:
         err = f"没有启用的渠道匹配模型 '{model}'，请检查渠道开关或模型列表"
         db.add_log(None, "未匹配渠道", "none", model or "-", 404, False, 0, error_detail=err)
         return JSONResponse(status_code=404, content={"error": {"message": err}})
 
+    upstream_payload = dict(payload)
+    upstream_payload["model"] = clean_model
     attempt_list = candidates if auto_failover else candidates[:1]
 
     if is_stream:
@@ -818,7 +848,7 @@ async def proxy_chat_completions(request: Request):
                 if not provider:
                     continue
                 t0 = time.perf_counter()
-                status_code, stream_iter, usage_info = await provider.chat_stream(ch["config"], payload)
+                status_code, stream_iter, usage_info = await provider.chat_stream(ch["config"], upstream_payload)
                 yielded_any = False
                 buffered_err = ""
                 try:
@@ -861,7 +891,7 @@ async def proxy_chat_completions(request: Request):
             continue
         t0 = time.perf_counter()
         try:
-            res = await provider.chat(ch["config"], payload)
+            res = await provider.chat(ch["config"], upstream_payload)
         except Exception as exc:
             latency = int((time.perf_counter() - t0) * 1000)
             err_msg = f"插件执行异常: {exc}"
